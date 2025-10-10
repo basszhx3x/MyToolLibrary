@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'MyToolLibrary'
+  s.name             = 'ChimpionTools'
   s.version          = '1.0.0'
   s.summary          = 'A collection of useful Swift tools and utilities.'
   s.description      = <<-DESC
