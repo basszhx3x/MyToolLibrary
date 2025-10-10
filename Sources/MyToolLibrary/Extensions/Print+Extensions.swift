@@ -7,7 +7,7 @@
 
 import Foundation
 
-func printLog(_ items: Any..., separator: String = " ", terminator: String = "\n") {
+public func printLog(_ items: Any..., separator: String = " ", terminator: String = "\n") {
 #if DEBUG
     let currentDate = Date()
     let calendar = Calendar.current

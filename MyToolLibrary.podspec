@@ -17,4 +17,17 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   s.source_files = 'Sources/MyToolLibrary/**/*.swift'
   
   s.frameworks = 'Foundation', 'UIKit'
+  
+    # 资源文件
+  #s.resource_bundles = {
+  #  'MyLibrary' => ['Resources/*.png', 'Resources/*.xib']
+  #}
+
+  # 公开的头文件（如果是 Swift，通常不需要）
+  # s.public_header_files = 'Sources/**/*.h'
+
+  # 依赖其他库
+  # s.dependency 'Alamofire', '~> 5.4'
+  s.dependency 'KeychainSwift'
+  
 end
