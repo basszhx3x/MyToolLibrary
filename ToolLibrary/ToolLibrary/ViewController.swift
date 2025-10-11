@@ -6,7 +6,12 @@
 //
 
 import UIKit
+import ChimpionTools
 
+//@MainActor
+class observable<T> : ChimpObservable<T> {
+   
+}
 class ViewController: UIViewController {
 
     override func viewDidLoad() {

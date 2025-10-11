@@ -18,7 +18,7 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   
   s.ios.resource_bundle = { 'ChimpionTools' => 'Sources/Assets/**/*' }
   
-  s.frameworks = 'Foundation', 'UIKit'
+  s.frameworks = 'Foundation', 'UIKit', 'CoreImage'
   
     # 资源文件
   #s.resource_bundles = {

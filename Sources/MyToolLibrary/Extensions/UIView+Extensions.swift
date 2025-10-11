@@ -12,6 +12,7 @@ public extension UIView {
     func addBorder(width: CGFloat, color: UIColor) {
         self.layer.borderWidth = width
         self.layer.borderColor = color.cgColor
+        
     }
     
     /// 添加阴影

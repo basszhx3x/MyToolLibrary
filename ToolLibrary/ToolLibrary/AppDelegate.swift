@@ -18,7 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let status = "basszhx3x@163.com".isValidEmail
         printLog(status)
-                
+        
+        let ab : observable<String> = observable("111")
         return true
     }
 
@@ -38,4 +39,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
+
+
 
