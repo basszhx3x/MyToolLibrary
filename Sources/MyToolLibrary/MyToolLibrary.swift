@@ -9,5 +9,5 @@
 
 // 这里可以添加库的版本信息或其他全局配置
 public struct MyToolLibrary {
-    public static let version = "1.0.0"
+    public static let version = "1.2.1"
 }

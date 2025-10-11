@@ -11,10 +11,12 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   s.author           = { 'basszhx3x' => 'basszhx3x@gmail.com' }
   s.source           = { :git => 'https://github.com/basszhx3x/MyToolLibrary.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '15.0'
   s.swift_version = '5.0'
 
-  s.source_files = 'Sources/MyToolLibrary/**/*.swift'
+  s.source_files = 'Sources/MyToolLibrary/**/*'
+  
+  s.ios.resource_bundle = { 'ChimpionTools' => 'Sources/Assets/**/*' }
   
   s.frameworks = 'Foundation', 'UIKit'
   

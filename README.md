@@ -21,7 +21,7 @@
 在您的 Podfile 中添加：
 
 ```ruby
-pod 'MyToolLibrary', :git => 'https://github.com/basszhx3x/MyToolLibrary.git'
+pod 'ChimpionTools', :git => 'https://github.com/basszhx3x/MyToolLibrary.git'
 ```
 
 然后运行：
@@ -60,12 +60,12 @@ view.addShadow()
 
 ## 要求
 
-- iOS 12.0+
+- iOS 15.0+
 - Swift 5.0+
 
 ## 许可证
 
-MyToolLibrary 使用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+ChimpionTools 使用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
 ## 贡献
 
