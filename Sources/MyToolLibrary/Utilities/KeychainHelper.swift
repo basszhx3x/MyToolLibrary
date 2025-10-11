@@ -19,12 +19,12 @@ public struct KeychainHelper {
     
     // 存储用户名和密码‌:ml-citation{ref="3,4" data="citationList"}
     @discardableResult
-    static func save(key: String, value: String) -> Bool {
+    public static func save(key: String, value: String) -> Bool {
         keychain.set(value, forKey: key)
     }
     
     // 读取密码‌:ml-citation{ref="3,4" data="citationList"}
-    static func getValue(key: String?) -> String? {
+    public static func getValue(key: String?) -> String? {
         guard let account = key else {
             return nil
         }
@@ -33,12 +33,12 @@ public struct KeychainHelper {
     
     // 删除记录‌:ml-citation{ref="3,4" data="citationList"}
     @discardableResult
-    static func delete(key: String) -> Bool {
+    public static func delete(key: String) -> Bool {
         keychain.delete(key)
     }
     
     @discardableResult
-    static func deleteAll() -> Bool {
+    public static func deleteAll() -> Bool {
         keychain.clear()
     }
     
