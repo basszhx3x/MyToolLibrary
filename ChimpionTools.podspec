@@ -40,5 +40,11 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   # s.dependency 'Alamofire', '~> 5.4'
   s.dependency 'KeychainSwift'
   s.dependency 'SmartCodable'
+  s.dependency 'SnapKit'
+  s.dependency 'Kingfisher'
+  s.dependency 'Alamofire'
+  s.dependency 'SwiftyUserDefaults'
+  s.dependency 'SwiftyJSON'
+  s.dependency 'MJRefresh'
   
 end
