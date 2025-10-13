@@ -46,5 +46,10 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   s.dependency 'SwiftyUserDefaults'
   s.dependency 'SwiftyJSON'
   s.dependency 'MJRefresh'
+  s.dependency 'SwipeCellKit'
+  s.dependency 'Localize-Swift'
+  s.dependency 'SwiftDate'
+#  s.dependency 'MCBubble', :path => './'
+#  s.dependency 'MCToast', :path => './'
   
 end

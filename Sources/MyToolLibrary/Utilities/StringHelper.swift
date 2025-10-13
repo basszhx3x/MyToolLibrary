@@ -1,5 +1,5 @@
 import Foundation
-// 导入CommonCrypto以支持哈希功能
+import SwiftDate
 import CommonCrypto
 // MARK: - String 扩展
 public extension String {
@@ -523,4 +523,58 @@ public class StringEncryptor {
     }
 }
 
+public extension String {
+    
+    func getCurrentDate() -> DateInRegion {
+        let date =  DateInRegion(seconds: (Double(self) ?? 0), region: .current)
+        return date
+    }
+    
+    func getCurrentDateString() -> String {
+        guard Int(self) != 0,self.count > 2 else { return "" }
+        let date = getCurrentDate()
+        let dateString = date.toString(.custom("yyyy-MM-dd HH:mm"))
+        return dateString
+    }
+    
+    func getShortCurrentDateString() -> String {
+        guard Int(self) != 0,self.count > 2 else { return "" }
+        let date = getCurrentDate()
+        let dateString = date.toString(.custom("yyyy-MM-dd"))
+        return dateString
+    }
+    
+    func getShortCurrentDateString(custom:String) -> String {
+        guard Int(self) != 0,self.count > 2 else { return "" }
+        let date = getCurrentDate()
+        let dateString = date.toString(.custom(custom))
+        return dateString
+    }
+}
 
+extension String {
+    func size(withFont font: UIFont) -> CGSize {
+        let attributes = [NSAttributedString.Key.font: font]
+        return (self as NSString).size(withAttributes: attributes)
+    }
+    
+    func calculateStringWidth(font: UIFont) -> CGFloat {
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
+        let attributedText = NSAttributedString(string: self, attributes: attributes)
+        let maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFLOAT_MAX)
+        let size = attributedText.boundingRect(with: maxSize,
+                                              options: .usesLineFragmentOrigin,
+                                              context: nil)
+        return ceil(size.width)
+    }
+    
+    func calculateSize(withFont font: UIFont) -> CGSize {
+        let label = UILabel()
+        label.font = font
+        label.text = self
+        label.sizeToFit()
+       
+        return label.frame.size
+    }
+
+}
