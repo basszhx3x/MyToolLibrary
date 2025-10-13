@@ -16,8 +16,16 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
 
   s.source_files = 'Sources/MyToolLibrary/**/*'
   
-  s.ios.resource_bundle = { 'ChimpionTools' => 'Sources/Assets/**/*' }
-  
+  s.ios.resource_bundle = { 'ChimpionTools' => [
+      'Sources/Assets/**/*',
+      "Sources/MyToolLibrary/Resources/*"
+    ]
+  }
+#  s.resources = [
+#  #      "Resources/Images/**/*.{png,jpg}",  # 所有图片资源
+#  #      "Resources/Views/**/*.xib",         # 所有 XIB 资源
+#         "Sources/MyToolLibrary/**/*.json"            # 单个配置文件
+#  ]
   s.frameworks = 'Foundation', 'UIKit', 'CoreImage'
   
     # 资源文件
@@ -31,5 +39,6 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   # 依赖其他库
   # s.dependency 'Alamofire', '~> 5.4'
   s.dependency 'KeychainSwift'
+  s.dependency 'SmartCodable'
   
 end
