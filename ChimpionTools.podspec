@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ChimpionTools'
-  s.version          = '1.2.2'
+  s.version          = '1.2.3'
   s.summary          = 'A collection of useful Swift tools and utilities.'
   s.description      = <<-DESC
 MyToolLibrary is a collection of useful Swift tools, utilities, and extensions that can help speed up iOS development.
@@ -49,6 +49,7 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   s.dependency 'SwipeCellKit'
   s.dependency 'Localize-Swift'
   s.dependency 'SwiftDate'
+  s.dependency 'MCToast'
 #  s.dependency 'MCBubble', :path => './'
 #  s.dependency 'MCToast', :path => './'
   

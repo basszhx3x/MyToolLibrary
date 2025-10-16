@@ -19,8 +19,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let status = "basszhx3x@163.com".isValidEmail
         printLog(status)
         
-       let countrys =  CountryCodeInfo.readCountryModel()
-        printLog(countrys)
+//       let countrys =  CountryCodeInfo.readCountryModel()
+//        printLog(countrys)
         let ab : observable<String> = observable("111")
         return true
     }

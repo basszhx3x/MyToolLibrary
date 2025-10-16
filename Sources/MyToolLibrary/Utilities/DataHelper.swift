@@ -2,6 +2,14 @@ import Foundation
 import CommonCrypto
 import Compression
 
+public enum ImageFormat {
+    case jpeg
+    case png
+    case gif
+    case webp
+    case tiff
+    case unknown
+}
 // MARK: - Data 扩展
 public extension Data {
     /// 将Data转换为十六进制字符串
@@ -409,5 +417,71 @@ public class DataOperations {
         }
         
         return data.subdata(in: start..<(start + length))
+    }
+}
+
+public extension Data {
+    /// 判断图片数据的格式
+    var imageFormat: ImageFormat {
+        // 检查数据长度是否足够读取文件头
+        guard count >= 4 else { return .unknown }
+        
+        // 读取前几个字节（根据需要调整读取长度）
+        let header = self[0..<8] // 取前8字节，覆盖大部分格式的判断需求
+        let bytes = [UInt8](header)
+        
+        // JPEG: 0xFF 0xD8 0xFF
+        if bytes.count >= 3,
+           bytes[0] == 0xFF,
+           bytes[1] == 0xD8,
+           bytes[2] == 0xFF {
+            return .jpeg
+        }
+        
+        // PNG: 0x89 0x50 0x4E 0x47 0x0D 0x0A 0x1A 0x0A
+        if bytes.count >= 8,
+           bytes[0] == 0x89,
+           bytes[1] == 0x50,
+           bytes[2] == 0x4E,
+           bytes[3] == 0x47,
+           bytes[4] == 0x0D,
+           bytes[5] == 0x0A,
+           bytes[6] == 0x1A,
+           bytes[7] == 0x0A {
+            return .png
+        }
+        
+        // GIF: 0x47 0x49 0x46 0x38（"GIF8"）
+        if bytes.count >= 4,
+           bytes[0] == 0x47,
+           bytes[1] == 0x49,
+           bytes[2] == 0x46,
+           bytes[3] == 0x38 {
+            return .gif
+        }
+        
+        // WebP: 前4字节 0x52 0x49 0x46 0x46（"RIFF"），后4字节 0x57 0x45 0x42 0x50（"WEBP"）
+        if bytes.count >= 8,
+           bytes[0] == 0x52,
+           bytes[1] == 0x49,
+           bytes[2] == 0x46,
+           bytes[3] == 0x46,
+           bytes[4] == 0x57,
+           bytes[5] == 0x45,
+           bytes[6] == 0x42,
+           bytes[7] == 0x50 {
+            return .webp
+        }
+        
+        // TIFF: 两种格式 0x49 0x49 0x2A 0x00 或 0x4D 0x4D 0x00 0x2A
+        if bytes.count >= 4 {
+            let tiff1 = bytes[0] == 0x49 && bytes[1] == 0x49 && bytes[2] == 0x2A && bytes[3] == 0x00
+            let tiff2 = bytes[0] == 0x4D && bytes[1] == 0x4D && bytes[2] == 0x00 && bytes[3] == 0x2A
+            if tiff1 || tiff2 {
+                return .tiff
+            }
+        }
+        
+        return .unknown
     }
 }
