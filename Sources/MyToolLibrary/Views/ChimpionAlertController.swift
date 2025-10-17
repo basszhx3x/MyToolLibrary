@@ -2,11 +2,11 @@
 import UIKit
 
 // iOS/tvOS版本的自定义AlertController - 基于UIViewController完全自定义实现
-class ChimpionAlertController: UIViewController {
+public class ChimpionAlertController: UIViewController {
     
     // MARK: - 样式常量
-    static var alert: Int { 0 }  // 弹窗样式
-    static var sheet: Int { 1 }  // 底部弹出样式
+    public static var alert: Int { 0 }  // 弹窗样式
+    public static var sheet: Int { 1 }  // 底部弹出样式
     
     // MARK: - 属性
     
@@ -69,7 +69,7 @@ class ChimpionAlertController: UIViewController {
     // 记录当前样式
     private let preferredStyle: Int
     
-    init(title: String?, message: String?, preferredStyle: Int) {
+    public init(title: String?, message: String?, preferredStyle: Int) {
         self.titleText = title
         self.messageText = message
         self.preferredStyle = preferredStyle
@@ -96,7 +96,7 @@ class ChimpionAlertController: UIViewController {
     
     // MARK: - 生命周期方法
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         updateUI()
@@ -387,7 +387,7 @@ class ChimpionAlertController: UIViewController {
     // MARK: - 公共方法
     
     /// 添加按钮
-    func addAction(_ action: UIAlertCustomAction) {
+    public func addAction(_ action: UIAlertCustomAction) {
         alertActions.append(action)
         
         // 如果视图已加载，更新UI
@@ -397,7 +397,7 @@ class ChimpionAlertController: UIViewController {
     }
     
     /// 设置标题的字体和颜色
-    func setTitleStyle(font: UIFont, color: UIColor) {
+    public func setTitleStyle(font: UIFont, color: UIColor) {
         self.titleFont = font
         self.titleColor = color
         
@@ -407,7 +407,7 @@ class ChimpionAlertController: UIViewController {
     }
     
     /// 设置消息的字体和颜色
-    func setMessageStyle(font: UIFont, color: UIColor) {
+    public func setMessageStyle(font: UIFont, color: UIColor) {
         self.messageFont = font
         self.messageColor = color
         
@@ -417,7 +417,7 @@ class ChimpionAlertController: UIViewController {
     }
     
     /// 设置按钮的字体和颜色
-    func setButtonStyle(atIndex index: Int, font: UIFont, color: UIColor) {
+    public func setButtonStyle(atIndex index: Int, font: UIFont, color: UIColor) {
         buttonStyles[index] = (font: font, color: color)
         
         // 更新按钮样式
@@ -428,7 +428,7 @@ class ChimpionAlertController: UIViewController {
     }
     
     /// 设置所有按钮的字体和颜色
-    func setAllButtonsStyle(font: UIFont, color: UIColor) {
+    public func setAllButtonsStyle(font: UIFont, color: UIColor) {
         for index in 0..<alertActions.count {
             setButtonStyle(atIndex: index, font: font, color: color)
         }
@@ -436,12 +436,12 @@ class ChimpionAlertController: UIViewController {
 }
 
 // UIAlertCustomAction实现
-class UIAlertCustomAction {
+public class UIAlertCustomAction {
     let title: String?
     let style: Int
     let handler: ((UIAlertCustomAction?) -> Void)?
     
-    init(title: String?, style: Int, handler: ((UIAlertCustomAction?) -> Void)? = nil) {
+    public init(title: String?, style: Int, handler: ((UIAlertCustomAction?) -> Void)? = nil) {
         self.title = title
         self.style = style
         self.handler = handler
@@ -449,7 +449,7 @@ class UIAlertCustomAction {
 }
 
 // UIAlertCustomAction样式常量
-extension UIAlertCustomAction {
+public extension UIAlertCustomAction {
     static var cancel: Int { 0 }
     static var `default`: Int { 1 }
     static var destructive: Int { 2 }
