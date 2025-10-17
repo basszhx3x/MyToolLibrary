@@ -76,7 +76,7 @@ class ChimpionAlertController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         // 根据样式设置呈现方式
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             // Sheet模式
             modalPresentationStyle = .overCurrentContext
             modalTransitionStyle = .coverVertical
@@ -113,7 +113,7 @@ class ChimpionAlertController: UIViewController {
         view.addSubview(containerView)
         
         // 根据样式设置容器视图约束
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             // Sheet模式布局 - 底部弹出，适配刘海屏，自适应高度
             NSLayoutConstraint.activate([
                 containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -164,7 +164,7 @@ class ChimpionAlertController: UIViewController {
         ]
         
         // 根据样式调整按钮布局
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             // Sheet模式下按钮垂直排列
             buttonStackView.axis = .vertical
             buttonStackView.distribution = .fill
@@ -220,7 +220,7 @@ class ChimpionAlertController: UIViewController {
         updateButtonViews()
         
         // 处理Sheet模式下动态更新title和message时的按钮约束
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             // 查找并移除现有的按钮顶部约束
             NSLayoutConstraint.deactivate(buttonStackView.constraints.filter {
                 $0.firstAnchor == buttonStackView.topAnchor &&
@@ -299,7 +299,7 @@ class ChimpionAlertController: UIViewController {
         }
         
         // 在Sheet模式下设置按钮背景色和布局
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             button.backgroundColor = .white
             
             // 为按钮创建容器视图，避免直接在stackView中混合按钮和分割线导致的布局问题
@@ -378,7 +378,7 @@ class ChimpionAlertController: UIViewController {
     
     @objc private func backgroundTapped() {
         // Sheet模式下点击背景可以关闭
-        if preferredStyle == CustomAlertController.sheet {
+        if preferredStyle == ChimpionAlertController.sheet {
             dismiss(animated: true, completion: nil)
         }
         // Alert模式保持默认不关闭
@@ -455,10 +455,10 @@ extension UIAlertCustomAction {
     static var destructive: Int { 2 }
 }
 
-// MARK: - 数组安全扩展
-extension Array {
-    /// 安全访问数组元素，如果索引超出范围则返回nil
-    subscript(safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
-    }
-}
+//// MARK: - 数组安全扩展
+//extension Array {
+//    /// 安全访问数组元素，如果索引超出范围则返回nil
+//    subscript(safe index: Index) -> Element? {
+//        return indices.contains(index) ? self[index] : nil
+//    }
+//}
