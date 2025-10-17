@@ -22,7 +22,7 @@ public class ChimpionAlertController: UIViewController {
     private var buttonStyles: [Int: (font: UIFont, color: UIColor)] = [:]
     
     // 按钮和处理器相关
-    private var alertActions: [UIAlertCustomAction] = []
+    private var alertActions: [ChimpionAlertAction] = []
     
     // 视图组件
     private lazy var containerView: UIView = {
@@ -264,7 +264,7 @@ public class ChimpionAlertController: UIViewController {
         }
     }
     
-    private func createButton(for action: UIAlertCustomAction, index: Int) {
+    private func createButton(for action: ChimpionAlertAction, index: Int) {
         let button = UIButton(type: .system)
         button.setTitle(action.title, for: .normal)
         button.addTarget(self, action: #selector(buttonTapped(_:)), for: .touchUpInside)
@@ -289,9 +289,9 @@ public class ChimpionAlertController: UIViewController {
             
             // 根据按钮类型设置默认颜色
             switch action.style {
-            case UIAlertCustomAction.cancel:
+            case ChimpionAlertAction.cancel:
                 button.setTitleColor(.systemBlue, for: .normal)
-            case UIAlertCustomAction.destructive:
+            case ChimpionAlertAction.destructive:
                 button.setTitleColor(.systemRed, for: .normal)
             default:
                 button.setTitleColor(.systemBlue, for: .normal)
@@ -387,7 +387,7 @@ public class ChimpionAlertController: UIViewController {
     // MARK: - 公共方法
     
     /// 添加按钮
-    public func addAction(_ action: UIAlertCustomAction) {
+    public func addAction(_ action: ChimpionAlertAction) {
         alertActions.append(action)
         
         // 如果视图已加载，更新UI
@@ -435,21 +435,21 @@ public class ChimpionAlertController: UIViewController {
     }
 }
 
-// UIAlertCustomAction实现
-public class UIAlertCustomAction {
+// ChimpionAlertAction实现
+public class ChimpionAlertAction {
     let title: String?
     let style: Int
-    let handler: ((UIAlertCustomAction?) -> Void)?
+    let handler: ((ChimpionAlertAction?) -> Void)?
     
-    public init(title: String?, style: Int, handler: ((UIAlertCustomAction?) -> Void)? = nil) {
+    public init(title: String?, style: Int, handler: ((ChimpionAlertAction?) -> Void)? = nil) {
         self.title = title
         self.style = style
         self.handler = handler
     }
 }
 
-// UIAlertCustomAction样式常量
-public extension UIAlertCustomAction {
+// ChimpionAlertAction样式常量
+public extension ChimpionAlertAction {
     static var cancel: Int { 0 }
     static var `default`: Int { 1 }
     static var destructive: Int { 2 }
