@@ -22,7 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //       let countrys =  CountryCodeInfo.readCountryModel()
 //        printLog(countrys)
         let ab : observable<String> = observable("111")
-
+        
+//        FontSize.medium.pingFangMedium
         return true
     }
 
