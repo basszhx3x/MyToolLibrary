@@ -2,32 +2,54 @@ import Foundation
 import CommonCrypto
 import Compression
 
+/// 图片格式枚举
+/// 
+/// 用于标识各种常见的图片文件格式
 public enum ImageFormat {
+    /// JPEG格式
     case jpeg
+    /// PNG格式
     case png
+    /// GIF格式
     case gif
+    /// WebP格式
     case webp
+    /// TIFF格式
     case tiff
+    /// 未知格式
     case unknown
 }
 // MARK: - Data 扩展
+/// 为Data类型提供各种便捷操作和转换方法
 public extension Data {
     /// 将Data转换为十六进制字符串
+    /// 
+    /// 每个字节转换为两个十六进制字符，如0xAB转换为"ab"
+    /// - Returns: 小写的十六进制表示的字符串
     var hexString: String {
         return map { String(format: "%02x", $0) }.joined()
     }
     
     /// 将Data转换为Base64编码字符串
+    /// 
+    /// 使用标准的Base64编码，不包含换行符
+    /// - Returns: Base64编码后的字符串
     var base64EncodedString: String {
         return base64EncodedString()
     }
     
     /// 将Data转换为字符串（UTF-8编码）
+    /// 
+    /// 尝试使用UTF-8编码将数据转换为字符串
+    /// - Returns: 转换后的字符串，如果数据不是有效的UTF-8编码则返回nil
     var string: String? {
         return String(data: self, encoding: .utf8)
     }
     
     /// 计算Data的MD5哈希值
+    /// 
+    /// 使用CommonCrypto框架计算MD5哈希值
+    /// - Returns: 16字节的MD5哈希值
     var md5: Data {
         var hash = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
         withUnsafeBytes { _ = CC_MD5($0.baseAddress, CC_LONG(count), &hash) }
@@ -35,6 +57,9 @@ public extension Data {
     }
     
     /// 计算Data的SHA256哈希值
+    /// 
+    /// 使用CommonCrypto框架计算SHA256哈希值
+    /// - Returns: 32字节的SHA256哈希值
     var sha256: Data {
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         withUnsafeBytes { _ = CC_SHA256($0.baseAddress, CC_LONG(count), &hash) }
@@ -42,13 +67,19 @@ public extension Data {
     }
     
     /// 计算Data的SHA512哈希值
+    /// 
+    /// 使用CommonCrypto框架计算SHA512哈希值
+    /// - Returns: 64字节的SHA512哈希值
     var sha512: Data {
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA512_DIGEST_LENGTH))
         withUnsafeBytes { _ = CC_SHA512($0.baseAddress, CC_LONG(count), &hash) }
         return Data(hash)
     }
     
-    /// 使用Gzip压缩Data
+    /// 使用Gzip/LZMA算法压缩Data
+    /// 
+    /// 使用系统的Compression框架进行数据压缩
+    /// - Returns: 压缩后的数据，如果压缩失败则返回nil
     func gzipCompressed() -> Data? {
         var compressedData = Data()
         
@@ -113,7 +144,10 @@ public extension Data {
         return compressedData
     }
     
-    /// 使用Gzip解压缩Data
+    /// 使用Gzip/LZMA算法解压缩Data
+    /// 
+    /// 使用系统的Compression框架进行数据解压缩
+    /// - Returns: 解压缩后的数据，如果解压缩失败则返回nil
     func gzipDecompressed() -> Data? {
         var decompressedData = Data()
         
@@ -179,12 +213,19 @@ public extension Data {
     }
     
     /// 从Base64编码字符串创建Data
+    /// 
+    /// - Parameter base64String: Base64编码的字符串
+    /// - Returns: 解码后的Data对象，如果字符串不是有效的Base64格式则返回nil
     static func fromBase64String(_ base64String: String) -> Data? {
         return Data(base64Encoded: base64String)
     }
     
     /// 从十六进制字符串创建Data
-    static func fromHexString(_ hexString: String) -> Data? {
+    /// 
+    /// 解析十六进制字符串为字节数据
+    /// - Parameter hexString: 十六进制格式的字符串，可以包含空格
+    /// - Returns: 解析后的Data对象，如果字符串格式不正确则返回nil
+    static func fromHexString(_ hexString: String) -> Data?
         var hex = hexString
         var data = Data()
         
@@ -214,9 +255,16 @@ public extension Data {
 }
 
 // MARK: - 数据加密工具类
+/// 提供各种加密和解密功能的工具类
 public class CryptoHelper {
     /// AES加密（ECB模式，PKCS7填充）
-    static func aesEncrypt(data: Data, key: Data) -> Data? {
+    /// 
+    /// 使用AES-256算法进行加密
+    /// - Parameters:
+    ///   - data: 要加密的数据
+    ///   - key: 加密密钥，建议使用32字节长度
+    /// - Returns: 加密后的数据，如果加密失败则返回nil
+    static func aesEncrypt(data: Data, key: Data) -> Data?
         let cryptLength = size_t(kCCBlockSizeAES128 + data.count + kCCBlockSizeAES128)
         var cryptData = Data(count: cryptLength)
         
@@ -252,7 +300,13 @@ public class CryptoHelper {
     }
     
     /// AES解密（ECB模式，PKCS7填充）
-    static func aesDecrypt(data: Data, key: Data) -> Data? {
+    /// 
+    /// 使用AES-256算法进行解密
+    /// - Parameters:
+    ///   - data: 要解密的数据
+    ///   - key: 解密密钥，必须与加密密钥相同
+    /// - Returns: 解密后的数据，如果解密失败则返回nil
+    static func aesDecrypt(data: Data, key: Data) -> Data?
         let cryptLength = data.count
         var cryptData = Data(count: cryptLength)
         
@@ -288,7 +342,13 @@ public class CryptoHelper {
     }
     
     /// HMAC-SHA256签名
-    static func hmacSHA256(data: Data, key: Data) -> Data {
+    /// 
+    /// 使用指定密钥对数据进行HMAC-SHA256签名
+    /// - Parameters:
+    ///   - data: 要签名的数据
+    ///   - key: 签名密钥
+    /// - Returns: 32字节的HMAC-SHA256签名数据
+    static func hmacSHA256(data: Data, key: Data) -> Data
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         
         data.withUnsafeBytes { dataBytes in
@@ -307,9 +367,14 @@ public class CryptoHelper {
 }
 
 // MARK: - 数据转换工具类
+/// 提供数据转换功能的工具类，主要用于JSON和对象之间的转换
 public class DataConverter {
     /// 将任何Encodable类型转换为Data
-    static func toData<T: Encodable>(_ value: T) -> Data? {
+    /// 
+    /// 将Swift对象编码为JSON数据
+    /// - Parameter value: 要转换的Encodable对象
+    /// - Returns: 编码后的JSON数据，如果编码失败则返回nil
+    static func toData<T: Encodable>(_ value: T) -> Data?
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {
@@ -321,6 +386,12 @@ public class DataConverter {
     }
     
     /// 将Data转换为任何Decodable类型
+    /// 
+    /// 将JSON数据解码为Swift对象
+    /// - Parameters:
+    ///   - data: 要解码的JSON数据
+    ///   - type: 目标类型
+    /// - Returns: 解码后的对象，如果解码失败则返回nil
     static func fromData<T: Decodable>(_ data: Data, type: T.Type) -> T? {
         let decoder = JSONDecoder()
         do {
@@ -332,24 +403,40 @@ public class DataConverter {
     }
     
     /// 将JSON字符串转换为Data
+    /// 
+    /// - Parameter jsonString: JSON格式的字符串
+    /// - Returns: 对应的Data对象，如果字符串不是有效的UTF-8编码则返回nil
     static func fromJSONString(_ jsonString: String) -> Data? {
         return jsonString.data(using: .utf8)
     }
     
     /// 将Data转换为JSON字符串
+    /// 
+    /// - Parameter data: 要转换的数据，通常是JSON数据
+    /// - Returns: 转换后的字符串，如果数据不是有效的UTF-8编码则返回nil
     static func toJSONString(_ data: Data) -> String? {
         return String(data: data, encoding: .utf8)
     }
 }
 
 // MARK: - 数据验证工具类
+/// 提供数据验证功能的工具类
 public class DataValidator {
     /// 验证数据是否为空
+    /// 
+    /// - Parameter data: 要验证的数据
+    /// - Returns: 如果数据长度为0则返回true，否则返回false
     static func isEmpty(_ data: Data) -> Bool {
         return data.count == 0
     }
     
     /// 验证数据大小是否在指定范围内
+    /// 
+    /// - Parameters:
+    ///   - data: 要验证的数据
+    ///   - minSize: 最小允许的字节数，默认为0
+    ///   - maxSize: 最大允许的字节数，为nil时表示不限制
+    /// - Returns: 如果数据大小在范围内则返回true，否则返回false
     static func isSizeValid(_ data: Data, minSize: Int = 0, maxSize: Int? = nil) -> Bool {
         if data.count < minSize {
             return false
@@ -363,6 +450,12 @@ public class DataValidator {
     }
     
     /// 检查数据是否包含特定模式
+    /// 
+    /// 使用线性搜索算法检查数据中是否包含指定的字节模式
+    /// - Parameters:
+    ///   - data: 要搜索的原始数据
+    ///   - pattern: 要查找的字节模式
+    /// - Returns: 如果找到匹配的模式则返回true，否则返回false
     static func containsPattern(_ data: Data, pattern: Data) -> Bool {
         guard pattern.count > 0, pattern.count <= data.count else {
             return false
@@ -381,8 +474,13 @@ public class DataValidator {
 }
 
 // MARK: - 数据操作工具类
+/// 提供数据操作功能的工具类
 public class DataOperations {
     /// 合并多个Data对象
+    /// 
+    /// 按顺序将多个Data对象合并为一个
+    /// - Parameter dataArray: 要合并的Data对象数组
+    /// - Returns: 合并后的Data对象
     static func merge(_ dataArray: [Data]) -> Data {
         var mergedData = Data()
         for data in dataArray {
@@ -392,6 +490,12 @@ public class DataOperations {
     }
     
     /// 分割Data为指定大小的块
+    /// 
+    /// 将数据分割成多个指定大小的块
+    /// - Parameters:
+    ///   - data: 要分割的数据
+    ///   - chunkSize: 每个块的大小（字节）
+    /// - Returns: 分割后的Data块数组
     static func split(_ data: Data, chunkSize: Int) -> [Data] {
         guard chunkSize > 0, data.count > 0 else {
             return [data]
@@ -411,6 +515,12 @@ public class DataOperations {
     }
     
     /// 从Data中提取指定范围的数据
+    /// 
+    /// - Parameters:
+    ///   - data: 原始数据
+    ///   - start: 起始位置（字节偏移量）
+    ///   - length: 要提取的数据长度（字节）
+    /// - Returns: 提取的子数据，如果范围无效则返回nil
     static func extractRange(_ data: Data, start: Int, length: Int) -> Data? {
         guard start >= 0, length >= 0, start + length <= data.count else {
             return nil
@@ -422,6 +532,9 @@ public class DataOperations {
 
 public extension Data {
     /// 判断图片数据的格式
+    /// 
+    /// 通过检查文件头字节来识别常见的图片格式
+    /// - Returns: 识别出的图片格式，如果无法识别则返回.unknown
     var imageFormat: ImageFormat {
         // 检查数据长度是否足够读取文件头
         guard count >= 4 else { return .unknown }
