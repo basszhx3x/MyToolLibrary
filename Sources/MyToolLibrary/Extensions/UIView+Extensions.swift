@@ -62,7 +62,54 @@ public extension UIView {
         // 返回配置完成的视图
         return view
     }
-
+    
+    /// 获取或设置视图的宽度
+    var zhWidth: CGFloat {
+        get {
+            return self.bounds.size.width
+        }
+        set {
+            var frame = self.frame
+            frame.size.width = newValue
+            self.frame = frame
+        }
+    }
+    
+    /// 获取或设置视图的高度
+    var zhHeight: CGFloat {
+        get {
+            return self.bounds.size.height
+        }
+        set {
+            var frame = self.frame
+            frame.size.height = newValue
+            self.frame = frame
+        }
+    }
+    
+    /// 获取或设置视图的x坐标
+    var zhX: CGFloat {
+        get {
+            return self.frame.origin.x
+        }
+        set {
+            var frame = self.frame
+            frame.origin.x = newValue
+            self.frame = frame
+        }
+    }
+    
+    /// 获取或设置视图的y坐标
+    var zhY: CGFloat {
+        get {
+            return self.frame.origin.y
+        }
+        set {
+            var frame = self.frame
+            frame.origin.y = newValue
+            self.frame = frame
+        }
+    }
 }
 
 #endif
