@@ -225,7 +225,7 @@ public extension Data {
     /// 解析十六进制字符串为字节数据
     /// - Parameter hexString: 十六进制格式的字符串，可以包含空格
     /// - Returns: 解析后的Data对象，如果字符串格式不正确则返回nil
-    static func fromHexString(_ hexString: String) -> Data?
+    static func fromHexString(_ hexString: String) -> Data? {
         var hex = hexString
         var data = Data()
         
@@ -264,7 +264,7 @@ public class CryptoHelper {
     ///   - data: 要加密的数据
     ///   - key: 加密密钥，建议使用32字节长度
     /// - Returns: 加密后的数据，如果加密失败则返回nil
-    static func aesEncrypt(data: Data, key: Data) -> Data?
+    static func aesEncrypt(data: Data, key: Data) -> Data? {
         let cryptLength = size_t(kCCBlockSizeAES128 + data.count + kCCBlockSizeAES128)
         var cryptData = Data(count: cryptLength)
         
@@ -306,7 +306,7 @@ public class CryptoHelper {
     ///   - data: 要解密的数据
     ///   - key: 解密密钥，必须与加密密钥相同
     /// - Returns: 解密后的数据，如果解密失败则返回nil
-    static func aesDecrypt(data: Data, key: Data) -> Data?
+    static func aesDecrypt(data: Data, key: Data) -> Data? {
         let cryptLength = data.count
         var cryptData = Data(count: cryptLength)
         
@@ -348,7 +348,7 @@ public class CryptoHelper {
     ///   - data: 要签名的数据
     ///   - key: 签名密钥
     /// - Returns: 32字节的HMAC-SHA256签名数据
-    static func hmacSHA256(data: Data, key: Data) -> Data
+    static func hmacSHA256(data: Data, key: Data) -> Data {
         var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         
         data.withUnsafeBytes { dataBytes in
@@ -374,7 +374,7 @@ public class DataConverter {
     /// 将Swift对象编码为JSON数据
     /// - Parameter value: 要转换的Encodable对象
     /// - Returns: 编码后的JSON数据，如果编码失败则返回nil
-    static func toData<T: Encodable>(_ value: T) -> Data?
+    static func toData<T: Encodable>(_ value: T) -> Data? {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         do {
