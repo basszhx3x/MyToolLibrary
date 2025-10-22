@@ -790,5 +790,38 @@ public extension String {
         
         return label.frame.size
     }
-
+    
+    /// 将JSON字符串转换为数组
+    /// 
+    /// 尝试解析JSON格式的字符串并返回对应的数组
+    /// - Returns: 解析后的数组，如果字符串不是有效的JSON或不是数组格式则返回nil
+    func toArray() -> [Any]? {
+        guard let data = self.data(using: .utf8) else {
+            return nil
+        }
+        
+        do {
+            let object = try JSONSerialization.jsonObject(with: data, options: [])
+            return object as? [Any]
+        } catch {
+            return nil
+        }
+    }
+    
+    /// 将JSON字符串转换为字典
+    /// 
+    /// 尝试解析JSON格式的字符串并返回对应的字典
+    /// - Returns: 解析后的字典，如果字符串不是有效的JSON或不是字典格式则返回nil
+    func toDictionary() -> [String: Any]? {
+        guard let data = self.data(using: .utf8) else {
+            return nil
+        }
+        
+        do {
+            let object = try JSONSerialization.jsonObject(with: data, options: [])
+            return object as? [String: Any]
+        } catch {
+            return nil
+        }
+    }
 }

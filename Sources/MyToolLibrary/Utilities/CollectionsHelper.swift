@@ -93,6 +93,25 @@ public extension Array {
             insert(element, at: index)
         }
     }
+    
+    /// 将数组转换为JSON字符串
+    /// 
+    /// 仅支持可序列化为JSON的数组元素
+    /// - Parameter prettyPrinted: 是否美化输出（添加缩进和换行），默认为false
+    /// - Returns: 转换后的JSON字符串，如果转换失败则返回nil
+    func toJsonString(prettyPrinted: Bool = false) -> String? {
+        guard JSONSerialization.isValidJSONObject(self) else {
+            return nil
+        }
+        
+        do {
+            let options: JSONSerialization.WritingOptions = prettyPrinted ? .prettyPrinted : []
+            let jsonData = try JSONSerialization.data(withJSONObject: self, options: options)
+            return String(data: jsonData, encoding: .utf8)
+        } catch {
+            return nil
+        }
+    }
 }
 
 // MARK: - 元素可比较的 Array 扩展
@@ -287,6 +306,25 @@ public extension Dictionary {
     /// - Returns: 被移除的值，如果键不存在则返回nil
     mutating func remove(key: Key) -> Value? {
         return removeValue(forKey: key)
+    }
+    
+    /// 将字典转换为JSON字符串
+    /// 
+    /// 仅支持可序列化为JSON的字典（键为String，值为可JSON序列化类型）
+    /// - Parameter prettyPrinted: 是否美化输出（添加缩进和换行），默认为false
+    /// - Returns: 转换后的JSON字符串，如果转换失败则返回nil
+    func toJsonString(prettyPrinted: Bool = false) -> String? {
+        guard JSONSerialization.isValidJSONObject(self) else {
+            return nil
+        }
+        
+        do {
+            let options: JSONSerialization.WritingOptions = prettyPrinted ? .prettyPrinted : []
+            let jsonData = try JSONSerialization.data(withJSONObject: self, options: options)
+            return String(data: jsonData, encoding: .utf8)
+        } catch {
+            return nil
+        }
     }
 }
 
