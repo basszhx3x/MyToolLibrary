@@ -45,6 +45,7 @@
 ### 自定义视图
 
 - **ChimpionAlertController**：自定义弹窗控制器
+- **ChimpionButton**：基于 iOS 15.0+ 的高度可定制按钮组件，支持多种图标布局方式、图片尺寸限制和内容配置
 
 ## 安装方式
 
@@ -150,11 +151,43 @@ let button: UIButton = .build {
 let image = BundleImage.loadImage(named: "myImage")
 ```
 
+### ChimpionButton 组件使用
+
+```swift
+// 创建并配置按钮
+let button = ChimpionButton(frame: CGRect(x: 50, y: 100, width: 200, height: 50))
+button.setTitle("添加到购物车", for: .normal)
+button.setTitleColor(.white, for: .normal)
+button.setImage(UIImage(named: "cart"), for: .normal)
+button.backgroundColor = .systemBlue
+button.layer.cornerRadius = 25
+
+// 设置图标位置
+button.imagePosition = .left  // 图标在左侧
+// button.imagePosition = .right  // 图标在右侧
+// button.imagePosition = .top    // 图标在上方
+// button.imagePosition = .bottom // 图标在下方
+
+// 设置间距和图片尺寸
+button.spacing = 12
+button.maxImageSize = CGSize(width: 24, height: 24)
+
+// 使用便捷方法一次性配置
+button.set(
+    title: "提交",
+    image: UIImage(named: "submit"),
+    position: .left,
+    spacing: 12,
+    maxImageSize: CGSize(width: 24, height: 24)
+)
+```
+
 ## 注意事项
 
 1. 使用 KeychainHelper 时，请确保已在 Podfile 中添加 KeychainSwift 依赖
 2. 在 iOS 15 及以上版本使用 pod 时，如遇到 Sandbox 相关错误，可尝试修改 User Script Sandboxing 设置为 NO
 3. 日志文件默认保存在应用的 Documents/Logs 目录下，按日期命名
+4. ChimpionButton 组件要求 iOS 15.0 或更高版本，因为它基于 UIButtonConfiguration API 构建
 
 ## 许可证
 

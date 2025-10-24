@@ -11,6 +11,10 @@
 /// 条件导出UIKit，仅在支持的平台上可用
 #if canImport(UIKit)
 @_exported import UIKit
+
+///// 导出自定义按钮组件
+//@_exported import struct MyToolLibrary.ChimpionButtonIconPosition
+//@_exported import class MyToolLibrary.ChimpionButton
 #endif
 
 /// MyToolLibrary框架的主结构，包含版本信息和其他全局配置

@@ -40,7 +40,7 @@ public class ChimpionGridView: UIView, UICollectionViewDelegateFlowLayout {
     // MARK: - 属性
     
     /// 内部集合视图
-    private lazy var collectionView: UICollectionView = {
+    public lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
