@@ -8,74 +8,125 @@
 import UIKit
 import ChimpionTools
 
-//@MainActor
-class observable<T> : ChimpObservable<T> {
-   
-}
-//class ViewController: UIViewController {
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        let topIconButton = ChimpionButton.button(
-//            title: "下载应用",
-//            image: UIImage(named: "homeBanner2"),
-//            iconPosition: .top,
-//            spacing: 0
-//        )
-//        topIconButton.frame = CGRect(x: 50, y: 200, width: 120, height: 100)
-//        topIconButton.setTitleColor(.black, for: .normal)
-//        topIconButton.backgroundColor = .systemGreen.withAlphaComponent(0.2)
-//        topIconButton.layer.cornerRadius = 12
-////        topIconButton.iconSize = CGSize(width: 32, height: 32)
-//        topIconButton.addTarget(self, action: #selector(downloadApp), for: .touchUpInside)
-//        view.addSubview(topIconButton)
-//        // Do any additional setup after loading the view.
-//    }
-//
-//    @objc func downloadApp() {
-//        printLog("downloadApp")
-//    }
-//}
-
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    // 表格视图属性
+    private let tableView = UITableView()
+    
+    // 定义测试项数据结构
+    struct TestItem {
+        let title: String
+        let controllerType: ControllerType
+        
+        enum ControllerType {
+            case customAlert
+            case button
+            case alert
+            case grid
+            case radioButton
+        }
+    }
+    
+    // 测试项列表
+    private let testItems: [TestItem] = [
+        TestItem(title: "ChimpionCustomAlertController 测试", controllerType: .customAlert),
+        TestItem(title: "ChimpionButton 测试", controllerType: .button),
+        TestItem(title: "ChimpionAlertController 测试", controllerType: .alert),
+        TestItem(title: "ChimpionGridView 测试", controllerType: .grid),
+        TestItem(title: "ChimpionRadioButton 测试", controllerType: .radioButton)
+    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // 创建按钮
-        let button1 = ChimpionButton()
-        button1.set(title: "左侧图标左侧图标", image: UIImage(named:"homeBanner2"), position: .left, spacing: 8)
-        button1.backgroundColor = .systemBlue
-        button1.setTitleColor(.white, for: .normal)
-        button1.frame = CGRect(x: 50, y: 100, width: 150, height: 44)
+        // 设置标题
+        title = "组件测试列表"
         
-        let button2 = ChimpionButton()
-        button2.set(title: "右侧图标", image: UIImage(named:"homeBanner2"), position: .right, spacing: 8)
-        button2.backgroundColor = .systemGreen
-        button2.setTitleColor(.white, for: .normal)
-        button2.frame = CGRect(x: 50, y: 160, width: 150, height: 44)
+        // 设置导航栏背景色
+        navigationController?.navigationBar.backgroundColor = .white
         
-        let button3 = ChimpionButton()
-        button3.set(title: "11", image: UIImage(named:"homeBanner2"), position: .top, spacing: 4)
-        button3.backgroundColor = .systemOrange
-        button3.setTitleColor(.white, for: .normal)
-        button3.frame = CGRect(x: 50, y: 220, width: 120, height: 100)
+        // 设置视图背景色
+        view.backgroundColor = .white
         
-        let button4 = ChimpionButton()
-        button4.set(title: "下方图标", image: UIImage(named:"homeBanner2"), position: .bottom, spacing: 4)
-        button4.backgroundColor = .systemPurple
-        button4.setTitleColor(.white, for: .normal)
-        button4.frame = CGRect(x: 50, y: 400, width: 120, height: 60)
-        
-        // 添加到视图
-        [button1, button2, button3, button4].forEach { view.addSubview($0) }
-        
-        // 添加点击事件
-        button1.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        // 配置表格视图
+        setupTableView()
     }
     
-    @objc private func buttonTapped() {
-        print("按钮被点击")
+    private func setupTableView() {
+        // 设置tableView的dataSource和delegate
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        // 注册单元格
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "TestCell")
+        
+        // 设置样式
+        tableView.backgroundColor = .white
+        tableView.separatorStyle = .singleLine
+        
+        // 添加到视图并设置约束
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
+    
+    // MARK: - Table view data source
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return testItems.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TestCell", for: indexPath)
+        let testItem = testItems[indexPath.row]
+        
+        // 配置单元格
+        cell.textLabel?.text = testItem.title
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
+        cell.accessoryType = .disclosureIndicator
+        
+        return cell
+    }
+    
+    // MARK: - Table view delegate
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let testItem = testItems[indexPath.row]
+        var viewController: UIViewController
+        
+        // 根据选择的测试项创建对应的视图控制器
+        switch testItem.controllerType {
+        case .customAlert:
+            viewController = CustomAlertControllerTestViewController()
+        case .button:
+            viewController = ButtonControllerTestViewController()
+        case .alert:
+            viewController = AlertControllerTestViewController()
+        case .grid:
+            viewController = GridViewControllerTestViewController()
+        case .radioButton:
+            viewController = RadioButtonTestViewController()
+        }
+        
+        // 设置标题并推送
+        viewController.title = testItem.title
+        navigationController?.pushViewController(viewController, animated: true)
+        
+        print("跳转到: \(testItem.title)")
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
 }
+
+// 导入测试视图控制器文件已单独创建，此处不包含内联定义
+

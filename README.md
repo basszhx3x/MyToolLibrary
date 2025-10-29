@@ -46,6 +46,9 @@
 
 - **ChimpionAlertController**：自定义弹窗控制器
 - **ChimpionButton**：基于 iOS 15.0+ 的高度可定制按钮组件，支持多种图标布局方式、图片尺寸限制和内容配置
+- **ChimpionNavigationBar**：模仿 iOS 原生导航栏的自定义组件，支持标题、左右两侧按钮和自定义视图配置
+- **ChimpionCustomAlertController**：可显示任意自定义视图的 Alert 控制器，智能处理尺寸布局，支持点击外部关闭
+- **ChimpionRadioButton**：基于 iOS 15.0+ 的高度可定制单选按钮组件，支持自定义颜色、图标、尺寸等，提供单选按钮组管理功能
 
 ## 安装方式
 
@@ -182,12 +185,149 @@ button.set(
 )
 ```
 
+### ChimpionNavigationBar 组件使用
+
+```swift
+// 创建导航栏
+let navigationBar = ChimpionNavigationBar()
+navigationBar.translatesAutoresizingMaskIntoConstraints = false
+navigationBar.title = "页面标题"
+navigationBar.barBackgroundColor = .white
+
+// 设置返回按钮
+navigationBar.setBackButton(target: self, action: #selector(backButtonTapped))
+
+// 设置右侧按钮
+let doneButton = UIButton(type: .system)
+doneButton.setTitle("完成", for: .normal)
+doneButton.setTitleColor(.systemBlue, for: .normal)
+navigationBar.setRightButton(doneButton, target: self, action: #selector(doneButtonTapped))
+
+// 添加到视图并设置约束
+view.addSubview(navigationBar)
+NSLayoutConstraint.activate([
+    navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+    navigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+])
+```
+
+### ChimpionRadioButton 组件使用
+
+```swift
+// 创建单个单选按钮
+let radioButton = ChimpionRadioButton()
+radioButton.setTitle("选项 1", for: .normal)
+
+// 使用RadioConfig配置单选按钮
+let customConfig = RadioConfig(
+    selectedColor: .systemGreen,
+    unselectedColor: .lightGray,
+    buttonSize: 24,
+    borderWidth: 2,
+    titleFont: .systemFont(ofSize: 16),
+    selectedTextColor: .systemGreen,
+    unselectedTextColor: .systemGray,
+    titlePadding: 10
+)
+radioButton.radioConfig = customConfig
+
+// 添加到视图
+view.addSubview(radioButton)
+
+// 创建单选按钮组
+let radioGroup = ChimpionRadioButtonGroup()
+
+// 设置选中变化回调
+radioGroup.onSelectionChanged = { [weak self] index in
+    if let index = index {
+        print("选中了索引: \(index)")
+    } else {
+        print("没有选中任何选项")
+    }
+}
+
+// 创建多个单选按钮
+let buttonTitles = ["选项 A", "选项 B", "选项 C"]
+for (index, title) in buttonTitles.enumerated() {
+    let button = ChimpionRadioButton()
+    button.setTitle(title, for: .normal)
+
+    // 添加到按钮组
+    radioGroup.addButton(button)
+
+    // 添加到视图
+    stackView.addArrangedSubview(button)
+}
+
+// 手动设置选中状态
+radioGroup.setSelected(at: 0) // 默认选中第一个选项
+```
+
+### ChimpionCustomAlertController 组件使用
+
+```swift
+// 创建自定义内容视图
+let customView = UIView()
+customView.translatesAutoresizingMaskIntoConstraints = false
+
+// 添加标题标签
+let titleLabel = UILabel()
+titleLabel.text = "自定义弹窗"
+titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+titleLabel.translatesAutoresizingMaskIntoConstraints = false
+customView.addSubview(titleLabel)
+
+// 添加关闭按钮
+let closeButton = UIButton(type: .system)
+closeButton.setTitle("关闭", for: .normal)
+closeButton.backgroundColor = .systemBlue
+closeButton.setTitleColor(.white, for: .normal)
+closeButton.layer.cornerRadius = 8
+closeButton.translatesAutoresizingMaskIntoConstraints = false
+customView.addSubview(closeButton)
+
+// 设置约束
+NSLayoutConstraint.activate([
+    // 内容视图尺寸约束
+    customView.widthAnchor.constraint(equalToConstant: 300),
+    customView.heightAnchor.constraint(equalToConstant: 200),
+
+    // 子视图约束
+    titleLabel.centerXAnchor.constraint(equalTo: customView.centerXAnchor),
+    titleLabel.topAnchor.constraint(equalTo: customView.topAnchor, constant: 30),
+
+    closeButton.centerXAnchor.constraint(equalTo: customView.centerXAnchor),
+    closeButton.bottomAnchor.constraint(equalTo: customView.bottomAnchor, constant: -30),
+    closeButton.widthAnchor.constraint(equalToConstant: 100),
+    closeButton.heightAnchor.constraint(equalToConstant: 40)
+])
+
+// 方式1：直接创建并显示
+let alertController = ChimpionCustomAlertController(contentView: customView)
+alertController.allowTapOutsideToDismiss = true
+alertController.show(in: self)
+
+// 方式2：使用便捷扩展方法
+// let alertController = self.showChimpionAlert(contentView: customView)
+
+// 为关闭按钮添加点击事件
+closeButton.addTarget(self, action: #selector(closeAlert), for: .touchUpInside)
+
+@objc func closeAlert() {
+    // 关闭弹窗
+    if let alertController = self.presentedViewController as? ChimpionCustomAlertController {
+        alertController.dismissAlert()
+    }
+}
+```
+
 ## 注意事项
 
 1. 使用 KeychainHelper 时，请确保已在 Podfile 中添加 KeychainSwift 依赖
 2. 在 iOS 15 及以上版本使用 pod 时，如遇到 Sandbox 相关错误，可尝试修改 User Script Sandboxing 设置为 NO
 3. 日志文件默认保存在应用的 Documents/Logs 目录下，按日期命名
-4. ChimpionButton 组件要求 iOS 15.0 或更高版本，因为它基于 UIButtonConfiguration API 构建
+4. ChimpionButton、ChimpionNavigationBar 和 ChimpionRadioButton 组件要求 iOS 15.0 或更高版本，其中 ChimpionButton 基于 UIButtonConfiguration API 构建
 
 ## 许可证
 
