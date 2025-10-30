@@ -29,7 +29,7 @@ public class BundleImage {
     }
 }
 
-extension UIImage {
+public extension UIImage {
     
     /// 加载图片资源（适配iOS版本）
     /// - Parameters:

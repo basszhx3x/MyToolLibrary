@@ -332,10 +332,10 @@ class RadioButtonTestViewController: UIViewController {
             radioButton.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
             
             // 添加点击处理
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(radioButtonTapped(_:)))
-            radioButton.addGestureRecognizer(tapGesture)
-            radioButton.isUserInteractionEnabled = true
-            radioButton.tag = index
+//            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(radioButtonTapped(_:)))
+//            radioButton.addGestureRecognizer(tapGesture)
+//            radioButton.isUserInteractionEnabled = true
+//            radioButton.tag = index
         }
         
         // 设置选择回调

@@ -40,6 +40,8 @@ public struct RadioConfig {
     public var selectedImage: UIImage?
     /// 未选中状态自定义图片
     public var unselectedImage: UIImage?
+    /// 按钮高度，默认44
+    public var buttonHeight: CGFloat
     
     /// 配置结构体的默认初始化器
     public init(
@@ -55,7 +57,8 @@ public struct RadioConfig {
         selectedTextColor: UIColor = .systemBlue,
         unselectedTextColor: UIColor = .systemGray,
         selectedImage: UIImage? = nil,
-        unselectedImage: UIImage? = nil
+        unselectedImage: UIImage? = nil,
+        buttonHeight: CGFloat = 44
     ) {
         self.selectedColor = selectedColor
         self.unselectedColor = unselectedColor
@@ -69,6 +72,7 @@ public struct RadioConfig {
         self.unselectedTextColor = unselectedTextColor
         self.selectedImage = selectedImage
         self.unselectedImage = unselectedImage
+        self.buttonHeight = buttonHeight
     }
 }
 
@@ -160,6 +164,17 @@ public class ChimpionRadioButton: UIButton {
         set { radioConfig.titleFont = newValue }
     }
     
+    /// 按钮高度
+    public var buttonHeight: CGFloat { 
+        get { radioConfig.buttonHeight } 
+        set { 
+            radioConfig.buttonHeight = newValue
+            invalidateIntrinsicContentSize() // 重新计算内部内容尺寸
+        }
+    }
+    
+    public var buttonHandle:((ChimpionRadioButton) -> Void)?
+    
     // MARK: - 初始化
     
     /// 使用配置初始化单选按钮
@@ -216,14 +231,22 @@ public class ChimpionRadioButton: UIButton {
         // 使用UIButtonConfiguration处理布局，这里仅更新配置中的内边距和间距
         guard var config = configuration else { return }
         
-        // 设置按钮内边距：左侧8pt，右侧8pt，上下各5pt
-        config.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 8, bottom: 5, trailing: 8)
+        // 计算上下内边距，确保按钮总高度等于配置的高度
+        // 按钮高度 = 上下内边距 + 内容高度（按钮大小 + 一些额外空间）
+        let contentHeight = radioConfig.buttonSize + 4 // 给按钮内容一些额外空间
+        let verticalPadding = max(0, (radioConfig.buttonHeight - contentHeight) / 2)
         
-        // 设置图片和标题之间的间距
-        config.imagePadding = radioConfig.titlePadding
+        // 创建新的内边距配置
+        let newContentInsets = NSDirectionalEdgeInsets(top: verticalPadding, leading: 8, bottom: verticalPadding, trailing: 8)
         
-        // 应用更新的配置
-        self.configuration = config
+        // 只有当配置真正发生变化时才更新，避免触发无限layout循环
+        if config.contentInsets != newContentInsets || config.imagePadding != radioConfig.titlePadding {
+            config.contentInsets = newContentInsets
+            config.imagePadding = radioConfig.titlePadding
+            
+            // 应用更新的配置
+            self.configuration = config
+        }
     }
     
     // MARK: - 尺寸计算
@@ -232,8 +255,8 @@ public class ChimpionRadioButton: UIButton {
         var size = super.intrinsicContentSize
         // 设置默认宽度为120，确保按钮有足够的最小宽度
         let defaultWidth: CGFloat = 120
-        // 设置默认高度为44
-        let defaultHeight: CGFloat = 44
+        // 使用配置中的按钮高度，默认为44
+        let defaultHeight: CGFloat = radioConfig.buttonHeight
         
         // 确保宽度足够容纳文本内容
         if let titleLabel = titleLabel, let text = titleLabel.text, !text.isEmpty {
@@ -381,6 +404,8 @@ public class ChimpionRadioButton: UIButton {
     // MARK: - 事件处理
     
     @objc private func buttonTapped() {
+        
+        buttonHandle?(self)
         // 不直接切换状态，只发送事件，由RadioButtonGroup统一管理状态
         sendActions(for: .valueChanged)
     }
@@ -648,12 +673,13 @@ public class ChimpionRadioButtonGroup {
     
     public func createRadioButtonsStackView(
         options: [String],
+        spacing: CGFloat = 12,
         selectionCallback: @escaping (Int?) -> Void,
         buttonCustomizer: ((ChimpionRadioButton, Int) -> Void)? = nil
     ) -> UIStackView {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 12
+        stackView.spacing = spacing
         stackView.alignment = .leading
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
