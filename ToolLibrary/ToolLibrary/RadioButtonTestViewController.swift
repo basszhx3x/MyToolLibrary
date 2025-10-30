@@ -234,11 +234,7 @@ class RadioButtonTestViewController: UIViewController {
         
         let options = ["多选选项 1 多选选项", "多选选项 2", "多选选项 3", "多选选项 4", "多选选项 5"]
         
-        // 创建单选按钮堆栈视图
-        let stackView = createRadioButtonsStackView(
-            options: options,
-            radioGroup: selectionModeRadioGroup
-        ) { [weak self] index in
+        let stackView = selectionModeRadioGroup.createRadioButtonsHStackView(options: options) { [weak self] index in
             if let index = index {
                 self?.multipleSelectionLabel.text = "已选择: \(options[index])"
             } else {
@@ -248,6 +244,17 @@ class RadioButtonTestViewController: UIViewController {
             button.selectedColor = .systemGreen
             button.hideSelectedBackground = true
         }
+        
+//        let stackView = selectionModeRadioGroup.createRadioButtonsStackView(options: options) { [weak self] index in
+//            if let index = index {
+//                self?.multipleSelectionLabel.text = "已选择: \(options[index])"
+//            } else {
+//                self?.multipleSelectionLabel.text = "未选择任何选项"
+//            }
+//        } buttonCustomizer: { button, _ in
+//            button.selectedColor = .systemGreen
+//            button.hideSelectedBackground = true
+//        }
         
         // 默认设置为单选模式
         selectionModeRadioGroup.selectionMode = .single

@@ -289,9 +289,17 @@ public class ChimpionCustomAlertController: UIViewController {
         // 检查内容视图是否有固定高度约束
         if let heightConstraint = findHeightConstraint(for: contentView) {
             // 如果内容视图有固定高度，使用它
-            containerConstraints.append(
-                containerView.heightAnchor.constraint(equalToConstant: heightConstraint.constant)
-            )
+            if config.showCloseButton, let _ = closeButton {
+                let heightContainerView = heightConstraint.constant + CGFloat(44)
+                containerConstraints.append(
+                    containerView.heightAnchor.constraint(equalToConstant: heightContainerView)
+                )
+            }
+            else {
+                containerConstraints.append(
+                    containerView.heightAnchor.constraint(equalToConstant: heightConstraint.constant)
+                )
+            }
         } else {
             // 否则设置最小高度为300
             containerConstraints.append(

@@ -645,4 +645,127 @@ public class ChimpionRadioButtonGroup {
             onMultipleSelectionChanged?(selectedIndices)
         }
     }
+    
+    public func createRadioButtonsStackView(
+        options: [String],
+        selectionCallback: @escaping (Int?) -> Void,
+        buttonCustomizer: ((ChimpionRadioButton, Int) -> Void)? = nil
+    ) -> UIStackView {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 12
+        stackView.alignment = .leading
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        for (index, option) in options.enumerated() {
+            let radioButton = ChimpionRadioButton()
+            radioButton.setTitle(option, for: .normal)
+            radioButton.translatesAutoresizingMaskIntoConstraints = false
+            
+            // 应用自定义样式（如果提供）
+            buttonCustomizer?(radioButton, index)
+            
+            // 添加到单选按钮组
+            self.addButton(radioButton)
+            
+            // 添加到堆栈视图
+            stackView.addArrangedSubview(radioButton)
+            
+            // 设置宽度约束，使按钮宽度与堆栈视图一致
+            radioButton.widthAnchor.constraint(equalTo: stackView.widthAnchor).isActive = true
+            
+            // 添加点击处理
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(radioButtonCurrentTapped(_:)))
+            radioButton.addGestureRecognizer(tapGesture)
+            radioButton.isUserInteractionEnabled = true
+            radioButton.tag = index
+        }
+        
+        // 设置选择回调
+        self.onSelectionChanged = selectionCallback
+        
+        return stackView
+    }
+    
+    public func createRadioButtonsHStackView(
+        options: [String],
+        maxWidth: CGFloat = UIScreen.main.bounds.width - 32, // 默认屏幕宽度减去边距
+        selectionCallback: @escaping (Int?) -> Void,
+        buttonCustomizer: ((ChimpionRadioButton, Int) -> Void)? = nil
+    ) -> UIStackView {
+        let containerStackView = UIStackView()
+        containerStackView.axis = .vertical
+        containerStackView.spacing = 12
+        containerStackView.alignment = .leading
+        containerStackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        var currentRowStackView: UIStackView?
+        var currentRowWidth: CGFloat = 0
+        let horizontalSpacing: CGFloat = 12
+        
+        for (index, option) in options.enumerated() {
+            let radioButton = ChimpionRadioButton()
+            radioButton.setTitle(option, for: .normal)
+            radioButton.translatesAutoresizingMaskIntoConstraints = false
+            
+            // 应用自定义样式（如果提供）
+            buttonCustomizer?(radioButton, index)
+            
+            // 添加到单选按钮组
+            self.addButton(radioButton)
+            
+            // 估算按钮宽度（包含间距）
+            let buttonWidth = estimateButtonWidth(for: option) + horizontalSpacing
+            
+            // 检查是否需要换行
+            if currentRowStackView == nil || currentRowWidth + buttonWidth > maxWidth {
+                currentRowStackView = createHorizontalRowStackView()
+                containerStackView.addArrangedSubview(currentRowStackView!)
+                currentRowWidth = 0
+            }
+            
+            // 将按钮添加到当前行
+            currentRowStackView?.addArrangedSubview(radioButton)
+            currentRowWidth += buttonWidth
+            
+            // 设置按钮高度约束
+            radioButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+            
+            // 添加点击处理
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(radioButtonCurrentTapped(_:)))
+            radioButton.addGestureRecognizer(tapGesture)
+            radioButton.isUserInteractionEnabled = true
+            radioButton.tag = index
+        }
+        
+        // 设置选择回调
+        self.onSelectionChanged = selectionCallback
+        
+        return containerStackView
+    }
+
+    private func createHorizontalRowStackView() -> UIStackView {
+        let rowStackView = UIStackView()
+        rowStackView.axis = .horizontal
+        rowStackView.spacing = 12
+        rowStackView.alignment = .center
+        rowStackView.distribution = .fill
+        rowStackView.translatesAutoresizingMaskIntoConstraints = false
+        return rowStackView
+    }
+
+    private func estimateButtonWidth(for title: String) -> CGFloat {
+        let label = UILabel()
+        label.text = title
+        label.font = UIFont.systemFont(ofSize: 16) // 使用按钮的默认字体大小
+        label.sizeToFit()
+        return label.frame.width + 32 // 加上左右内边距
+    }
+    
+    @objc private func radioButtonCurrentTapped(_ sender: UITapGestureRecognizer) {
+        guard let radioButton = sender.view as? ChimpionRadioButton else { return }
+        
+        // 触发按钮的valueChanged事件，由ChimpionRadioButtonGroup统一管理状态
+        radioButton.sendActions(for: .valueChanged)
+    }
 }
