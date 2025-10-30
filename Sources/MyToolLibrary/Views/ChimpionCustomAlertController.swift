@@ -1,5 +1,17 @@
 import UIKit
 
+/// 弹窗动画类型
+public enum AlertAnimationType {
+    /// 缩放动画
+    case scale
+    /// 淡入淡出动画
+    case fade
+    /// 弹跳动画
+    case bounce
+    /// 自定义动画（提供自定义的动画闭包）
+    case custom((_ containerView: UIView, _ isShowing: Bool, _ completion: @escaping () -> Void) -> Void)
+}
+
 /// ChimpionAlert配置结构体，用于配置Alert的外观和行为
 public struct ChimpionAlertConfig {
     /// 容器视图的圆角大小
@@ -50,6 +62,18 @@ public struct ChimpionAlertConfig {
     /// 关闭按钮背景颜色，默认灰色背景
     public let closeButtonBackgroundColor: UIColor
     
+    /// 显示动画类型，默认使用缩放动画
+    public let animationType: AlertAnimationType
+    
+    /// 动画持续时间，默认0.3秒
+    public let animationDuration: TimeInterval
+    
+    /// 初始缩放比例（用于缩放和弹跳动画），默认0.8
+    public let initialScale: CGFloat
+    
+    /// 弹跳系数（仅用于弹跳动画），默认1.1
+    public let bounceScale: CGFloat
+    
     /// 默认配置
     public static let `default` = ChimpionAlertConfig(
         cornerRadius: 12,
@@ -67,7 +91,11 @@ public struct ChimpionAlertConfig {
         showCloseButton: false,
         closeButtonText: "关闭",
         closeButtonTextColor: .white,
-        closeButtonBackgroundColor: .systemBlue
+        closeButtonBackgroundColor: .systemBlue,
+        animationType: .scale,
+        animationDuration: 0.3,
+        initialScale: 0.8,
+        bounceScale: 1.1
     )
     
     /// 创建自定义配置
@@ -84,6 +112,10 @@ public struct ChimpionAlertConfig {
     ///   - horizontalPadding: 左右边距，默认20
     ///   - maxWidth: 最大宽度，默认400
     ///   - maxHeightRatio: 最大高度比例，默认0.8
+    ///   - animationType: 动画类型，默认缩放动画
+    ///   - animationDuration: 动画持续时间，默认0.3秒
+    ///   - initialScale: 初始缩放比例，默认0.8
+    ///   - bounceScale: 弹跳系数，默认1.1
     public init(
         cornerRadius: CGFloat = 12,
         shadowColor: UIColor = .black,
@@ -100,7 +132,11 @@ public struct ChimpionAlertConfig {
         showCloseButton: Bool = false,
         closeButtonText: String = "关闭",
         closeButtonTextColor: UIColor = .white,
-        closeButtonBackgroundColor: UIColor = .systemBlue
+        closeButtonBackgroundColor: UIColor = .systemBlue,
+        animationType: AlertAnimationType = .scale,
+        animationDuration: TimeInterval = 0.3,
+        initialScale: CGFloat = 0.8,
+        bounceScale: CGFloat = 1.1
     ) {
         self.cornerRadius = cornerRadius
         self.shadowColor = shadowColor
@@ -118,6 +154,10 @@ public struct ChimpionAlertConfig {
         self.closeButtonText = closeButtonText
         self.closeButtonTextColor = closeButtonTextColor
         self.closeButtonBackgroundColor = closeButtonBackgroundColor
+        self.animationType = animationType
+        self.animationDuration = animationDuration
+        self.initialScale = initialScale
+        self.bounceScale = bounceScale
     }
 }
 
@@ -200,6 +240,7 @@ public class ChimpionCustomAlertController: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         self.modalPresentationStyle = .overFullScreen
+        // 移除默认的过渡动画，使用我们自定义的动画
         self.modalTransitionStyle = .crossDissolve
     }
     
@@ -214,6 +255,21 @@ public class ChimpionCustomAlertController: UIViewController {
         setupViews()
         setupConstraints()
         setupTapGesture()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 初始化时设置为不可见
+        containerView.alpha = 0
+        backgroundView.alpha = 0
+        
+        // 启动显示动画
+        performShowAnimation()
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // 关闭时不使用自动的消失动画，因为我们在dismissAlert方法中手动实现了
     }
     
     // MARK: - Setup Methods
@@ -415,8 +471,110 @@ public class ChimpionCustomAlertController: UIViewController {
         
         // 检查点击位置是否在容器视图外部
         if !containerView.frame.contains(location) {
-            dismiss(animated: true, completion: nil)
+            dismissAlert()
         }
+    }
+    
+    // MARK: - Animation Methods
+    
+    /// 执行显示动画
+    private func performShowAnimation() {
+        // 设置初始状态
+        switch config.animationType {
+        case .scale, .bounce:
+            containerView.transform = CGAffineTransform(scaleX: config.initialScale, y: config.initialScale)
+        case .fade, .custom:
+            break // 淡入和自定义动画在下面单独处理
+        }
+        
+        // 执行动画
+        UIView.animateKeyframes(withDuration: config.animationDuration, delay: 0, options: [.calculationModeCubic], animations: {
+            // 淡入背景
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                self.backgroundView.alpha = 1.0
+            }
+            
+            switch self.config.animationType {
+            case .scale:
+                // 缩放动画 - 直接放大到1.0
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                    self.containerView.alpha = 1.0
+                    self.containerView.transform = .identity
+                }
+            
+            case .bounce:
+                // 弹跳动画 - 先放大到超过1.0，然后弹回到1.0
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.5) {
+                    self.containerView.alpha = 1.0
+                    self.containerView.transform = CGAffineTransform(scaleX: self.config.bounceScale, y: self.config.bounceScale)
+                }
+                
+                UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.5) {
+                    self.containerView.transform = .identity
+                }
+            
+            case .fade:
+                // 淡入动画
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                    self.containerView.alpha = 1.0
+                }
+            
+            case .custom(let customAnimation):
+                // 自定义动画
+                // 注意：自定义动画需要自己处理alpha，因为这里的关键帧动画不会影响它
+                break
+            }
+        }, completion: { _ in
+            // 自定义动画在关键帧动画结束后执行
+            if case .custom(let customAnimation) = self.config.animationType {
+                self.containerView.alpha = 1.0
+                customAnimation(self.containerView, true, {})
+            }
+        })
+    }
+    
+    /// 执行消失动画
+    private func performHideAnimation(completion: @escaping () -> Void) {
+        // 执行动画
+        UIView.animateKeyframes(withDuration: config.animationDuration, delay: 0, options: [.calculationModeCubic], animations: {
+            // 淡出背景
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                self.backgroundView.alpha = 0
+            }
+            
+            switch self.config.animationType {
+            case .scale:
+                // 缩放动画 - 缩小到初始比例
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                    self.containerView.alpha = 0
+                    self.containerView.transform = CGAffineTransform(scaleX: self.config.initialScale, y: self.config.initialScale)
+                }
+            
+            case .bounce:
+                // 弹跳动画 - 缩小到初始比例
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                    self.containerView.alpha = 0
+                    self.containerView.transform = CGAffineTransform(scaleX: self.config.initialScale, y: self.config.initialScale)
+                }
+            
+            case .fade:
+                // 淡出动画
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0) {
+                    self.containerView.alpha = 0
+                }
+            
+            case .custom(let customAnimation):
+                // 自定义动画 - 这里不做任何事情，在completion block中处理
+                break
+            }
+        }, completion: { _ in
+            // 检查是否是自定义动画
+            if case .custom(let customAnimation) = self.config.animationType {
+                customAnimation(self.containerView, false, completion)
+            } else {
+                completion()
+            }
+        })
     }
     
     // MARK: - Public Methods
@@ -424,12 +582,16 @@ public class ChimpionCustomAlertController: UIViewController {
     /// 显示Alert
     /// - Parameter presentingController: 要展示此Alert的控制器
     public func show(in presentingController: UIViewController) {
-        presentingController.present(self, animated: true, completion: nil)
+        // 使用animated: false，因为我们自己实现了动画效果
+        presentingController.present(self, animated: false, completion: nil)
     }
     
     /// 关闭Alert
     public func dismissAlert() {
-        dismiss(animated: true, completion: nil)
+        // 使用自定义动画关闭
+        performHideAnimation { [weak self] in
+            self?.dismiss(animated: false, completion: nil)
+        }
     }
     
     /// 更新内容视图的布局
@@ -489,7 +651,11 @@ extension UIViewController {
             showCloseButton: ChimpionAlertConfig.default.showCloseButton,
             closeButtonText: ChimpionAlertConfig.default.closeButtonText,
             closeButtonTextColor: ChimpionAlertConfig.default.closeButtonTextColor,
-            closeButtonBackgroundColor: ChimpionAlertConfig.default.closeButtonBackgroundColor
+            closeButtonBackgroundColor: ChimpionAlertConfig.default.closeButtonBackgroundColor,
+            animationType: ChimpionAlertConfig.default.animationType,
+            animationDuration: ChimpionAlertConfig.default.animationDuration,
+            initialScale: ChimpionAlertConfig.default.initialScale,
+            bounceScale: ChimpionAlertConfig.default.bounceScale
         )
         
         let alertController = ChimpionCustomAlertController(contentView: contentView, config: config)
