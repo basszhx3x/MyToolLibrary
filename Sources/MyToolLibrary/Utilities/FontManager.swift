@@ -10,51 +10,56 @@ import UIKit
 /// 预定义的字体大小枚举
 /// 
 /// 提供常用的字体大小选项，用于统一应用中的文本样式
-public enum FontChimpionSize: Float {
+public enum FontChimpionSize {
     /// 极小字体（辅助文字）- size 10
     /// 
     /// 适用于非常小的辅助说明文字
-    case extraSmall = 10
+    case extraSmall
     
     /// 微小字体（辅助文字）- size 12
     /// 
     /// 适用于次要的辅助说明文字
-    case tiny = 12
+    case tiny
     
     /// 小字体（说明文字）- size 14
     /// 
     /// 适用于说明性文字、标签等
-    case small = 14
+    case small
     
     /// 常规字体（正文）- size 16
     /// 
     /// 适用于主要内容文本，阅读体验最佳
-    case regular = 16
+    case regular
     
     /// 中等字体（小标题）- size 18
     /// 
     /// 适用于小节标题或重要内容的强调
-    case medium = 18
+    case medium
     
     /// 大中等字体（小标题）- size 20
     /// 
     /// 适用于较大的小标题或需要突出显示的文本
-    case largeMedium = 20
+    case largeMedium
     
     /// 大字体（标题）- size 22
     /// 
     /// 适用于中等级别的页面标题
-    case large = 22
+    case large
     
     /// 超大字体（主标题）- size 28
     /// 
     /// 适用于页面主标题或重要内容的强调
-    case extraLarge = 28
+    case extraLarge
     
     /// 特大字体（特殊标题）- size 36
     /// 
     /// 适用于特殊场合的大标题或需要特别强调的文本
-    case doubleExtraLarge = 36
+    case doubleExtraLarge
+    
+    /// 自定义字体大小
+    /// 
+    /// 允许设置任意自定义的字体大小
+    case custom(size: Float)
 }
 
 /// 字体管理类
@@ -196,6 +201,24 @@ extension FontChimpionSize {
     /// - Returns: 将枚举值转换为CGFloat类型的字体大小
     public var value: CGFloat {
         return CGFloat(self.rawValue)
+    }
+    
+    /// 获取原始浮点数值
+    /// 
+    /// - Returns: 字体大小的浮点值
+    public var rawValue: Float {
+        switch self {
+        case .extraSmall: return 10
+        case .tiny: return 12
+        case .small: return 14
+        case .regular: return 16
+        case .medium: return 18
+        case .largeMedium: return 20
+        case .large: return 22
+        case .extraLarge: return 28
+        case .doubleExtraLarge: return 36
+        case .custom(let size): return size
+        }
     }
     
     /// 获取PingFangSC-Regular字体
