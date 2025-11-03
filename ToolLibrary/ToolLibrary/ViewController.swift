@@ -25,6 +25,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             case grid
             case radioButton
             case segmentControl
+            case attributedString
         }
     }
     
@@ -35,7 +36,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         TestItem(title: "ChimpionAlertController 测试", controllerType: .alert),
         TestItem(title: "ChimpionGridView 测试", controllerType: .grid),
         TestItem(title: "ChimpionRadioButton 测试", controllerType: .radioButton),
-        TestItem(title: "ChimpionSegmentControl 测试", controllerType: .segmentControl)
+        TestItem(title: "ChimpionSegmentControl 测试", controllerType: .segmentControl),
+        TestItem(title: "NSAttributedString扩展 测试", controllerType: .attributedString)
     ]
     
     override func viewDidLoad() {
@@ -118,6 +120,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             viewController = RadioButtonTestViewController()
         case .segmentControl:
             viewController = SegmentControlTestViewController()
+        case .attributedString:
+            viewController = AttributedStringTestViewController()
         }
         
         // 设置标题并推送
