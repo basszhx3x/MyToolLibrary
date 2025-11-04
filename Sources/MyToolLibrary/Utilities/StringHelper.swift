@@ -41,6 +41,33 @@ public extension String {
         return !isEmpty && rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil
     }
     
+    /// 将字符串转换为布尔值
+    /// 
+    /// 支持的格式："true"/"false"（不区分大小写）、"1"/"0"、"yes"/"no"（不区分大小写）
+    /// - Returns: 转换后的布尔值，如果无法转换则返回nil
+    var boolValue: Bool? {
+        let lowercased = self.lowercased()
+        
+        // 处理常见的布尔值表示形式
+        switch lowercased {
+        case "true", "yes", "1":
+            return true
+        case "false", "no", "0":
+            return false
+        default:
+            return nil
+        }
+    }
+    
+    /// 安全地将字符串转换为布尔值
+    /// 
+    /// 如果字符串不能转换为布尔值，则返回指定的默认值
+    /// - Parameter defaultValue: 无法转换时的默认值
+    /// - Returns: 转换后的布尔值或默认值
+    func toBool(defaultValue: Bool = false) -> Bool {
+        return boolValue ?? defaultValue
+    }
+    
     /// 移除字符串中的所有空格
     /// 
     /// 删除字符串中所有出现的空格字符
