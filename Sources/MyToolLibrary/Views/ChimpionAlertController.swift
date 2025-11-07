@@ -3,6 +3,11 @@ import UIKit
 
 // iOS/tvOS版本的自定义AlertController - 基于UIViewController完全自定义实现
 public class ChimpionAlertController: UIViewController {
+    // MARK: - 窗口相关属性
+    private var alertWindow: UIWindow?
+    private var alertWindowScene: UIWindowScene?
+    
+    // MARK: - 静态样式常量
     
     // MARK: - 样式常量
     public static var alert: Int { 0 }  // 弹窗样式
@@ -56,6 +61,7 @@ public class ChimpionAlertController: UIViewController {
     
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView()
+        // 默认设置为水平方向，将在setupUI中根据样式动态调整
         stackView.axis = .horizontal
         stackView.distribution = .fillProportionally
         stackView.alignment = .fill
@@ -74,17 +80,6 @@ public class ChimpionAlertController: UIViewController {
         self.messageText = message
         self.preferredStyle = preferredStyle
         super.init(nibName: nil, bundle: nil)
-        
-        // 根据样式设置呈现方式
-        if preferredStyle == ChimpionAlertController.sheet {
-            // Sheet模式
-            modalPresentationStyle = .overCurrentContext
-            modalTransitionStyle = .coverVertical
-        } else {
-            // 默认Alert模式
-            modalPresentationStyle = .overCurrentContext
-            modalTransitionStyle = .crossDissolve
-        }
         
         // 半透明背景
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -111,6 +106,13 @@ public class ChimpionAlertController: UIViewController {
     private func setupUI() {
         // 添加容器视图
         view.addSubview(containerView)
+        
+        // 根据样式设置stackView的axis属性
+        if preferredStyle == ChimpionAlertController.sheet {
+            buttonStackView.axis = .vertical
+        } else {
+            buttonStackView.axis = .horizontal
+        }
         
         // 根据样式设置容器视图约束
         if preferredStyle == ChimpionAlertController.sheet {
@@ -211,6 +213,7 @@ public class ChimpionAlertController: UIViewController {
         // 添加点击背景关闭手势
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped))
         tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
         view.addGestureRecognizer(tapGesture)
     }
     
@@ -373,13 +376,13 @@ public class ChimpionAlertController: UIViewController {
             action.handler?(action)
         }
         
-        dismiss(animated: true, completion: nil)
+        hide(animated: true)
     }
     
     @objc private func backgroundTapped() {
         // Sheet模式下点击背景可以关闭
         if preferredStyle == ChimpionAlertController.sheet {
-            dismiss(animated: true, completion: nil)
+            hide(animated: true)
         }
         // Alert模式保持默认不关闭
     }
@@ -433,6 +436,96 @@ public class ChimpionAlertController: UIViewController {
             setButtonStyle(atIndex: index, font: font, color: color)
         }
     }
+    
+    // MARK: - 显示和隐藏方法
+    
+    /// 显示弹窗
+    public func show(animated: Bool = true) {
+        // 创建自定义窗口场景
+        if #available(iOS 13.0, *) {
+            // 获取当前活动的窗口场景
+            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                alertWindowScene = scene
+                setupWindow(with: scene)
+            } else {
+                // 如果找不到活动场景，使用默认方法
+                fallbackPresent()
+            }
+        } else {
+            // iOS 13以下版本使用兼容方法
+            fallbackPresent()
+        }
+    }
+    
+    /// 隐藏弹窗
+    public func hide(animated: Bool = true) {
+        if animated {
+            UIView.animate(withDuration: 0.25, animations: {
+                self.view.alpha = 0
+                if self.preferredStyle == ChimpionAlertController.sheet {
+                    // Sheet模式的关闭动画
+                    self.containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+                } else {
+                    // Alert模式的关闭动画
+                    self.containerView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+                }
+            }) { [weak self] _ in
+                guard let self = self else { return }
+                self.alertWindow?.isHidden = true
+                self.alertWindow = nil
+                self.alertWindowScene = nil
+            }
+        } else {
+            alertWindow?.isHidden = true
+            alertWindow = nil
+            alertWindowScene = nil
+        }
+    }
+    
+    /// 设置自定义窗口
+    private func setupWindow(with scene: UIWindowScene) {
+        // 创建新窗口
+        alertWindow = UIWindow(windowScene: scene)
+        alertWindow?.windowLevel = .alert
+        alertWindow?.backgroundColor = .clear
+        alertWindow?.rootViewController = self
+        
+        // 显示窗口
+        alertWindow?.makeKeyAndVisible()
+        
+        // 初始状态设置
+        view.alpha = 0
+        if preferredStyle == ChimpionAlertController.sheet {
+            // Sheet模式的初始位置
+            containerView.transform = CGAffineTransform(translationX: 0, y: view.bounds.height)
+        } else {
+            // Alert模式的初始大小
+            containerView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        }
+        
+        // 动画显示
+        UIView.animate(withDuration: 0.25) {
+            self.view.alpha = 1
+            self.containerView.transform = .identity
+        }
+    }
+    
+    /// 兼容模式下的显示方法（iOS 13以下或找不到窗口场景时使用）
+    private func fallbackPresent() {
+        // 获取当前最顶层的视图控制器
+        if let topViewController = UIApplication.shared.keyWindow?.rootViewController?.topmostViewController() {
+            modalPresentationStyle = .overCurrentContext
+            modalTransitionStyle = .crossDissolve
+            topViewController.present(self, animated: true, completion: nil)
+        }
+    }
+    
+    // MARK: - 重写dismiss方法以兼容旧的调用方式
+    
+    public override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        hide(animated: flag)
+        completion?()
+    }
 }
 
 // ChimpionAlertAction实现
@@ -448,11 +541,39 @@ public class ChimpionAlertAction {
     }
 }
 
+extension ChimpionAlertController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        return touch.view == view
+    }
+}
+
 // ChimpionAlertAction样式常量
 public extension ChimpionAlertAction {
     static var cancel: Int { 0 }
     static var `default`: Int { 1 }
     static var destructive: Int { 2 }
+}
+
+
+
+// MARK: - UIViewController扩展
+public extension UIViewController {
+    /// 获取最顶层的视图控制器
+    func topmostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topmostViewController()
+        }
+        
+        if let navigation = self as? UINavigationController {
+            return navigation.visibleViewController?.topmostViewController() ?? navigation
+        }
+        
+        if let tab = self as? UITabBarController {
+            return tab.selectedViewController?.topmostViewController() ?? tab
+        }
+        
+        return self
+    }
 }
 
 //// MARK: - 数组安全扩展

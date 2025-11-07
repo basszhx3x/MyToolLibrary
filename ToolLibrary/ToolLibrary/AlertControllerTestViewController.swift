@@ -83,8 +83,8 @@ class AlertControllerTestViewController: UIViewController {
         alertController.setTitleStyle(font: UIFont.boldSystemFont(ofSize: 18), color: .systemBlue)
         alertController.setMessageStyle(font: UIFont.systemFont(ofSize: 16), color: .darkGray)
         
-        // 呈现弹窗
-        present(alertController, animated: true, completion: nil)
+        // 显示弹窗
+        alertController.show()
     }
     
     /// 显示Sheet样式的确认弹窗
@@ -110,8 +110,8 @@ class AlertControllerTestViewController: UIViewController {
         }
         sheetController.addAction(confirmAction)
         
-        // 呈现Sheet样式弹窗
-        present(sheetController, animated: true, completion: nil)
+        // 显示Sheet样式弹窗
+        sheetController.show()
     }
     
     /// 显示操作成功提示
@@ -129,7 +129,7 @@ class AlertControllerTestViewController: UIViewController {
         // 设置按钮样式
         successAlert.setTitleStyle(font: UIFont.boldSystemFont(ofSize: 18), color: .systemGreen)
         
-        // 呈现成功提示
-        present(successAlert, animated: true, completion: nil)
+        // 显示成功提示
+        successAlert.show()
     }
 }
