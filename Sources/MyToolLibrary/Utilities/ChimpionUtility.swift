@@ -404,7 +404,7 @@ public class ChimpionUtility {
     /// - Parameters:
     ///   - appID: 应用的App Store ID
     ///   - completion: 完成回调，包含版本号和可能的错误信息
-    public static func getAppStoreVersion(appID: String, completion: @escaping (String?, Error?) -> Void) {
+    public static func getAppStoreVersion(appID: String, completion: @escaping (String?,String?, Error?) -> Void) {
         // App Store Search API URL
         let url = "https://itunes.apple.com/lookup?id=\(appID)"
         
@@ -420,19 +420,20 @@ public class ChimpionUtility {
                     if let results = json["results"].array, !results.isEmpty {
                         // 获取第一个结果中的版本号
                         let version = results[0]["version"].string
-                        completion(version, nil)
+                        let releaseNote = results[0]["releaseNotes"].string
+                        completion(version, releaseNote ,nil)
                     } else {
                         // 没有找到结果
                         let error = NSError(domain: "ChimpionUtilityError", code: 1, userInfo: [NSLocalizedDescriptionKey: "未找到应用信息"])
-                        completion(nil, error)
+                        completion(nil,nil ,error)
                     }
                 } catch {
                     // JSON解析错误
-                    completion(nil, error)
+                    completion(nil, nil,error)
                 }
             case .failure(let error):
                 // 网络请求错误
-                completion(nil, error)
+                completion(nil, nil,error)
             }
         }
     }
@@ -443,20 +444,20 @@ public class ChimpionUtility {
     /// - Parameters:
     ///   - appID: 应用的App Store ID
     ///   - completion: 完成回调，包含是否有新版本、最新版本号和可能的错误信息
-    public static func checkForUpdates(appID: String, completion: @escaping (Bool, String?, Error?) -> Void) {
+    public static func checkForUpdates(appID: String, completion: @escaping (Bool, String?, String?,Error?) -> Void) {
         // 获取当前本地版本
         let currentVersion = self.appVersion
         
         // 获取App Store版本
-        getAppStoreVersion(appID: appID) { (storeVersion, error) in
+        getAppStoreVersion(appID: appID) { (storeVersion, note ,error) in
             guard let storeVersion = storeVersion else {
-                completion(false, nil, error)
+                completion(false, nil,note ,error)
                 return
             }
             
             // 比较版本号
             let hasNewVersion = self.compareVersions(currentVersion: currentVersion, storeVersion: storeVersion)
-            completion(hasNewVersion, storeVersion, nil)
+            completion(hasNewVersion, storeVersion, note,nil)
         }
     }
     
