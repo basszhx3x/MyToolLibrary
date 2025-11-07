@@ -17,8 +17,9 @@
 
 ### 字符串处理
 
-- **String 扩展**：截断、哈希计算（MD5/SHA256）、Base64 编解码、安全访问等
+- **String 扩展**：截断、哈希计算（MD5/SHA256）、Base64 编解码、安全访问、字符串转布尔值等
 - **StringParser**：数字提取、URL 提取、HTML 文本提取、JSON 解析
+- **NSAttributedString 扩展**：便捷构造方法、链式调用、文本样式设置、文本高亮等功能
 
 ### 时间处理
 
@@ -98,6 +99,38 @@ let hash = "password123".md5
 if let dict = StringParser.parseJSONStringToDictionary(jsonString) {
     // 处理解析后的字典
 }
+
+// 字符串转布尔值
+let trueString = "true"
+let boolValue = trueString.boolValue // true
+let falseString = "0"
+let boolValue2 = falseString.boolValue // false
+let unknownString = "unknown"
+let boolValue3 = unknownString.boolValue // nil
+let boolWithDefault = unknownString.toBool(defaultValue: false) // false
+
+// NSAttributedString 便捷构造
+let attributedString = NSAttributedString(string: "Hello World",
+                                         font: .systemFont(ofSize: 18),
+                                         color: .systemBlue)
+
+// 链式调用设置样式
+let styledString = NSAttributedString(string: "Styled Text")
+    .withFont(.boldSystemFont(ofSize: 20))
+    .withColor(.red)
+    .withUnderline()
+
+// NSMutableAttributedString 应用样式
+let mutableString = NSMutableAttributedString(string: "Hello World")
+mutableString.applyingAttributes([.font: UIFont.boldSystemFont(ofSize: 16)],
+                               range: NSRange(location: 0, length: 5))
+
+// 文本高亮
+let text = "Highlight this word"
+let highlighted = NSMutableAttributedString(string: text)
+highlighted.highlightSubstring("this",
+                              withColor: .yellow,
+                              backgroundColor: .orange)
 ```
 
 ### 数据转换

@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 /// 提供常用的工具方法，包括屏幕尺寸、导航栏高度、刘海屏适配、环境判断、线程切换等
 public class ChimpionUtility {
@@ -394,5 +396,101 @@ public class ChimpionUtility {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
         return formatter.string(fromByteCount: Int64(size))
+    }
+    
+    /// 获取App Store上应用的最新版本信息
+    /// 
+    /// 通过App Store Search API获取指定应用ID的最新版本信息
+    /// - Parameters:
+    ///   - appID: 应用的App Store ID
+    ///   - completion: 完成回调，包含版本号和可能的错误信息
+    public static func getAppStoreVersion(appID: String, completion: @escaping (String?, Error?) -> Void) {
+        // App Store Search API URL
+        let url = "https://itunes.apple.com/lookup?id=\(appID)"
+        
+        // 使用Alamofire发送请求
+        AF.request(url).responseData { response in
+            switch response.result {
+            case .success(let data):
+                do {
+                    // 使用SwiftyJSON解析JSON
+                    let json = try JSON(data: data)
+                    
+                    // 检查响应是否包含结果
+                    if let results = json["results"].array, !results.isEmpty {
+                        // 获取第一个结果中的版本号
+                        let version = results[0]["version"].string
+                        completion(version, nil)
+                    } else {
+                        // 没有找到结果
+                        let error = NSError(domain: "ChimpionUtilityError", code: 1, userInfo: [NSLocalizedDescriptionKey: "未找到应用信息"])
+                        completion(nil, error)
+                    }
+                } catch {
+                    // JSON解析错误
+                    completion(nil, error)
+                }
+            case .failure(let error):
+                // 网络请求错误
+                completion(nil, error)
+            }
+        }
+    }
+    
+    /// 检查应用是否有新版本
+    /// 
+    /// 比较本地版本与App Store版本，判断是否需要更新
+    /// - Parameters:
+    ///   - appID: 应用的App Store ID
+    ///   - completion: 完成回调，包含是否有新版本、最新版本号和可能的错误信息
+    public static func checkForUpdates(appID: String, completion: @escaping (Bool, String?, Error?) -> Void) {
+        // 获取当前本地版本
+        let currentVersion = self.appVersion
+        
+        // 获取App Store版本
+        getAppStoreVersion(appID: appID) { (storeVersion, error) in
+            guard let storeVersion = storeVersion else {
+                completion(false, nil, error)
+                return
+            }
+            
+            // 比较版本号
+            let hasNewVersion = self.compareVersions(currentVersion: currentVersion, storeVersion: storeVersion)
+            completion(hasNewVersion, storeVersion, nil)
+        }
+    }
+    
+    /// 比较两个版本号
+    /// 
+    /// 简单的版本号比较算法，按点分隔比较各部分数字
+    /// - Parameters:
+    ///   - currentVersion: 当前版本号
+    ///   - storeVersion: App Store版本号
+    /// - Returns: 如果storeVersion大于currentVersion则返回true，否则返回false
+    private static func compareVersions(currentVersion: String, storeVersion: String) -> Bool {
+        // 将版本号按点分隔成数组
+        let currentComponents = currentVersion.split(separator: ".").map { Int($0) ?? 0 }
+        let storeComponents = storeVersion.split(separator: ".").map { Int($0) ?? 0 }
+        
+        // 获取最大长度
+        let maxLength = max(currentComponents.count, storeComponents.count)
+        
+        // 逐部分比较版本号
+        for i in 0..<maxLength {
+            // 获取当前位置的版本号部分，如果超出数组范围则视为0
+            let currentNum = i < currentComponents.count ? currentComponents[i] : 0
+            let storeNum = i < storeComponents.count ? storeComponents[i] : 0
+            
+            // 比较当前部分
+            if storeNum > currentNum {
+                return true // App Store版本更新
+            } else if storeNum < currentNum {
+                return false // 当前版本更新
+            }
+            // 如果相等则继续比较下一部分
+        }
+        
+        // 所有部分都相等
+        return false
     }
 }

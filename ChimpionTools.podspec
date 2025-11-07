@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ChimpionTools'
-  s.version          = '2.0.2'
+  s.version          = '2.0.3'
   s.summary          = 'A collection of useful Swift tools and utilities.'
   s.description      = <<-DESC
 MyToolLibrary is a collection of useful Swift tools, utilities, and extensions that can help speed up iOS development.
@@ -15,6 +15,9 @@ MyToolLibrary is a collection of useful Swift tools, utilities, and extensions t
   s.swift_version = '5.0'
 
   s.source_files = 'Sources/MyToolLibrary/**/*'
+  s.exclude_files = [
+    'Sources/MyToolLibrary/**/*.md'
+  ]
   
   s.ios.resource_bundle = { 'ChimpionTools' => [
       'Sources/Assets/**/*',
