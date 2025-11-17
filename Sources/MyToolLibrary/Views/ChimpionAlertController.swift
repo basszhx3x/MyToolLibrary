@@ -419,6 +419,10 @@ public class ChimpionAlertController: UIViewController {
         messageLabel.textColor = color
     }
     
+    public func setMessageTextAlignment(_ textAlignment: NSTextAlignment) {
+        messageLabel.textAlignment = textAlignment
+    }
+    
     /// 设置按钮的字体和颜色
     public func setButtonStyle(atIndex index: Int, font: UIFont, color: UIColor) {
         buttonStyles[index] = (font: font, color: color)
