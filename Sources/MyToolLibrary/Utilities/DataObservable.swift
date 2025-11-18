@@ -11,7 +11,6 @@ import Foundation
 /// 
 /// 实现了观察者模式，用于在数据变化时通知订阅者
 /// 使用@MainActor确保所有观察回调在主线程执行
-@MainActor
 open class ChimpObservable<T> {
     /// 观察者闭包类型定义
     public typealias ChimpObserver = (T) -> Void
