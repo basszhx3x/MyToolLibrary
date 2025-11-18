@@ -308,7 +308,7 @@ public extension String {
         let maskedCount = totalLength - showFirst - showLast
         let maskedPart = String(repeating: mask, count: maskedCount)
         
-        return "\\(firstPart)\\(maskedPart)\\(lastPart)"
+        return "\(firstPart)\(maskedPart)\(lastPart)"
     }
 }
 
@@ -369,7 +369,7 @@ public class StringFormatter {
         let secondPart = digits.dropFirst(3).prefix(4)
         let thirdPart = digits.dropFirst(7)
         
-        return "\\(firstPart) \\(secondPart) \\(thirdPart)"
+        return "\(firstPart) \(secondPart) \(thirdPart)"
     }
 }
 
