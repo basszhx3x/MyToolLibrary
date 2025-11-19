@@ -447,6 +447,7 @@ public class ChimpionRadioButtonGroup {
     /// 当前选中的按钮索引（单选模式下）
     public var selectedIndex: Int?
     
+    public var disableAllSelected:Bool = true
     /// 当前选中的按钮索引集合（多选模式下）
     public var selectedIndices: Set<Int> = []
     
@@ -622,13 +623,16 @@ public class ChimpionRadioButtonGroup {
         if selectionMode == .single {
             // 单选模式逻辑
             if selectedIndex == index {
-                // 如果点击的是已选中的按钮，取消选中
-                for button in radioButtons {
-                    button.isSelected = false
+                if disableAllSelected {
+                    // 如果点击的是已选中的按钮，取消选中
+                    for button in radioButtons {
+                        button.isSelected = false
+                    }
+                    selectedIndex = nil
+                    selectedIndices.removeAll()
+                    onSelectionChanged?(nil)
                 }
-                selectedIndex = nil
-                selectedIndices.removeAll()
-                onSelectionChanged?(nil)
+                
             } else {
                 // 更新所有按钮的选中状态
                 for (i, button) in radioButtons.enumerated() {
