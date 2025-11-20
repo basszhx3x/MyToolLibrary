@@ -298,3 +298,44 @@ public extension UIImage {
     }
 }
 
+public extension UIImage {
+    
+    /// 转化图片为 png 类型的字符串
+    func imageToPngBase64() -> String? {
+        // 将 UIImage 转换为 Data（比如 PNG 格式）
+        guard let imageData = pngData() else {
+            return nil
+        }
+        
+        // 将 Data 转换为 Base64 字符串
+        return imageData.base64EncodedString()
+    }
+    
+    /// 转化图片为 jpeg 类型的字符串
+    func imageToJpegBase64(compress quality:CGFloat = 0.7) -> String? {
+        // 将 UIImage 转换为 Data（比如 PNG 格式）
+        guard let imageData = jpegData(compressionQuality: 0.7) else {
+            return nil
+        }
+        
+        // 将 Data 转换为 Base64 字符串
+        return imageData.base64EncodedString()
+    }
+    
+    /// image 转化为上传到服务器的字符串
+    /// - Parameters:
+    ///   - isPng: 转化为 png、jpeg
+    ///   - quality: jpeg 模式压缩量
+    /// - Returns: Base64编码后的可上传服务器的字符串
+    func imageToUploadServerString(png isPng:Bool = false,compress quality:CGFloat = 0.7) -> String? {
+        if isPng {
+            guard let imageString = imageToPngBase64() else { return nil }
+            return "data:image/png;base64,\(imageString)"
+        }
+        else {
+            guard let imageString = imageToJpegBase64(compress: quality) else { return nil }
+            return "data:image/jpeg;base64,\(imageString)"
+        }
+        
+    }
+}

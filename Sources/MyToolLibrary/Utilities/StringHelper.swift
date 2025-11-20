@@ -852,3 +852,19 @@ public extension String {
         }
     }
 }
+
+extension String {
+    
+    /// 将字符串中连续的多个空格替换为一个空格
+    ///   let text = "Hello     world   !   "
+    ///   let result = text.condenseSpaces()
+    ///   print(result)  // "Hello world ! "
+    /// - Returns: 返回替换空格后的字符串
+    func condenseSpaces() -> String {
+        let pattern = "\\s+"
+        return replacingOccurrences(of: pattern,
+                                    with: " ",
+                                    options: .regularExpression,
+                                    range: nil)
+    }
+}

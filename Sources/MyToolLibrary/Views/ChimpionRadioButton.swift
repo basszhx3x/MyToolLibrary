@@ -719,19 +719,21 @@ public class ChimpionRadioButtonGroup {
     
     public func createRadioButtonsHStackView(
         options: [String],
+        spacing:CGFloat = 12,
+        buttonHeight:CGFloat = 44,
         maxWidth: CGFloat = UIScreen.main.bounds.width - 32, // 默认屏幕宽度减去边距
         selectionCallback: @escaping (Int?) -> Void,
         buttonCustomizer: ((ChimpionRadioButton, Int) -> Void)? = nil
     ) -> UIStackView {
         let containerStackView = UIStackView()
         containerStackView.axis = .vertical
-        containerStackView.spacing = 12
+        containerStackView.spacing = spacing
         containerStackView.alignment = .leading
         containerStackView.translatesAutoresizingMaskIntoConstraints = false
         
         var currentRowStackView: UIStackView?
         var currentRowWidth: CGFloat = 0
-        let horizontalSpacing: CGFloat = 12
+        let horizontalSpacing: CGFloat = spacing
         
         for (index, option) in options.enumerated() {
             let radioButton = ChimpionRadioButton()
@@ -759,7 +761,7 @@ public class ChimpionRadioButtonGroup {
             currentRowWidth += buttonWidth
             
             // 设置按钮高度约束
-            radioButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+            radioButton.heightAnchor.constraint(equalToConstant: buttonHeight).isActive = true
             
             // 添加点击处理
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(radioButtonCurrentTapped(_:)))
