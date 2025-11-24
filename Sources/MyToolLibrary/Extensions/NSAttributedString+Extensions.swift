@@ -271,6 +271,34 @@ public extension NSMutableAttributedString {
         addAttribute(.font, value: font, range: range)
         return self
     }
+    /// 查找并修改文本颜色
+    /// - Parameters:
+    ///   - searchText: 要查找的文本
+    ///   - highlightColor: 高亮背景颜色
+    /// - Returns: 高亮后的自身实例
+    @discardableResult
+    func colorAll(occurrencesOf searchText: String, withColor highlightColor: UIColor) -> NSMutableAttributedString {
+        let fullText = string as NSString
+        var searchRange = NSRange(location: 0, length: fullText.length)
+        var foundRange: NSRange
+        
+        while true {
+            foundRange = fullText.range(of: searchText, options: [], range: searchRange)
+            if foundRange.location == NSNotFound {
+                break
+            }
+            
+            addAttribute(.foregroundColor, value: highlightColor, range: foundRange)
+            searchRange.location = foundRange.location + foundRange.length
+            searchRange.length = fullText.length - searchRange.location
+            
+            if searchRange.location >= fullText.length {
+                break
+            }
+        }
+        
+        return self
+    }
     
     /// 查找并高亮指定文本
     /// - Parameters:

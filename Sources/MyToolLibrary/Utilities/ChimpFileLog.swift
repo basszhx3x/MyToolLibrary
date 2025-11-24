@@ -18,9 +18,9 @@ public enum LogLevel: String {
 /// 日志工具类，负责将日志写入文件的单例类
 /// 
 /// 提供多级别日志记录、按日期分文件存储和日志清理功能
-public class IgatherFileLogger {
+public class ChimpFileLogger {
     /// 单例实例，全局共享的日志记录器
-    public static let shared = IgatherFileLogger()
+    public static let shared = ChimpFileLogger()
     
     /// 私有初始化方法，防止外部创建多个实例
     private init() {

@@ -1,6 +1,19 @@
 // 根据平台导入相应的框架
 import UIKit
 
+public struct ChimpAlertConfig {
+    
+    public let needSeparator:Bool
+    
+    public static let `default` = ChimpAlertConfig(
+        needSeparator: true
+    )
+    
+    public init(needSeparator: Bool = true) {
+        self.needSeparator = needSeparator
+    }
+}
+
 // iOS/tvOS版本的自定义AlertController - 基于UIViewController完全自定义实现
 public class ChimpionAlertController: UIViewController {
     // MARK: - 窗口相关属性
@@ -12,6 +25,8 @@ public class ChimpionAlertController: UIViewController {
     // MARK: - 样式常量
     public static var alert: Int { 0 }  // 弹窗样式
     public static var sheet: Int { 1 }  // 底部弹出样式
+    
+    public var config: ChimpAlertConfig?
     
     // MARK: - 属性
     
@@ -75,7 +90,7 @@ public class ChimpionAlertController: UIViewController {
     // 记录当前样式
     private let preferredStyle: Int
     
-    public init(title: String?, message: String?, preferredStyle: Int) {
+    public init(title: String?, message: String?,config:ChimpAlertConfig = ChimpAlertConfig.default ,preferredStyle: Int) {
         self.titleText = title
         self.messageText = message
         self.preferredStyle = preferredStyle
@@ -319,7 +334,7 @@ public class ChimpionAlertController: UIViewController {
             ])
             
             // 为每个按钮添加水平分割线（除了第一个）
-            if index > 0 {
+            if index > 0 ,let status = config?.needSeparator,status {
                 let separatorView = UIView()
                 separatorView.backgroundColor = .lightGray.withAlphaComponent(0.3)
                 separatorView.translatesAutoresizingMaskIntoConstraints = false
