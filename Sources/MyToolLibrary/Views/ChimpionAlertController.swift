@@ -94,6 +94,7 @@ public class ChimpionAlertController: UIViewController {
         self.titleText = title
         self.messageText = message
         self.preferredStyle = preferredStyle
+        self.config = config
         super.init(nibName: nil, bundle: nil)
         
         // 半透明背景
@@ -135,7 +136,7 @@ public class ChimpionAlertController: UIViewController {
             NSLayoutConstraint.activate([
                 containerView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
                 containerView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
                 containerView.topAnchor.constraint(greaterThanOrEqualTo: view.topAnchor) // 允许根据内容自适应高度
             ])
             
@@ -208,7 +209,7 @@ public class ChimpionAlertController: UIViewController {
                 buttonConstraints.append(buttonStackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8))
             }
 
-            buttonConstraints.append(buttonStackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16))
+            buttonConstraints.append(buttonStackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8))
         } else {
             // Alert模式下按钮水平排列
             buttonStackView.axis = .horizontal
@@ -341,7 +342,7 @@ public class ChimpionAlertController: UIViewController {
                 buttonStackView.addArrangedSubview(separatorView)
                 
                 NSLayoutConstraint.activate([
-                    separatorView.heightAnchor.constraint(equalToConstant: 1),
+                    separatorView.heightAnchor.constraint(equalToConstant: 0.5),
                     separatorView.leadingAnchor.constraint(equalTo: buttonStackView.leadingAnchor),
                     separatorView.trailingAnchor.constraint(equalTo: buttonStackView.trailingAnchor)
                 ])
@@ -358,7 +359,7 @@ public class ChimpionAlertController: UIViewController {
                 let bottomPadding = UIView()
                 bottomPadding.translatesAutoresizingMaskIntoConstraints = false
                 buttonStackView.addArrangedSubview(bottomPadding)
-                bottomPadding.heightAnchor.constraint(equalToConstant: 16).isActive = true
+                bottomPadding.heightAnchor.constraint(equalToConstant: 8).isActive = true
             }
         } else {
             // 在Alert模式下设置按钮固定高度为50

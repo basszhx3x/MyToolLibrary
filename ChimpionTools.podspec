@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'ChimpionTools'
-  s.version          = '2.0.8'
+  s.version          = '2.0.9'
   s.summary          = 'A collection of useful Swift tools and utilities.'
   s.description      = <<-DESC
 MyToolLibrary is a collection of useful Swift tools, utilities, and extensions that can help speed up iOS development.
