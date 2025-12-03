@@ -45,6 +45,10 @@ public class ChimpionAlertController: UIViewController {
     private var alertActions: [ChimpionAlertAction] = []
     
     // 视图组件
+    private var containerOriginalTransform: CGAffineTransform?
+    private var panGestureRecognizer: UIPanGestureRecognizer?
+    private let dismissThreshold: CGFloat = 100 // 下拉关闭阈值
+    
     private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -231,6 +235,13 @@ public class ChimpionAlertController: UIViewController {
         tapGesture.cancelsTouchesInView = false
         tapGesture.delegate = self
         view.addGestureRecognizer(tapGesture)
+        
+        // 为Sheet模式添加下拉关闭手势
+        if preferredStyle == ChimpionAlertController.sheet {
+            panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+            panGestureRecognizer?.delegate = self
+            containerView.addGestureRecognizer(panGestureRecognizer!)
+        }
     }
     
     private func updateUI() {
@@ -403,6 +414,43 @@ public class ChimpionAlertController: UIViewController {
         // Alert模式保持默认不关闭
     }
     
+    /// 处理下拉手势
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        guard preferredStyle == ChimpionAlertController.sheet else { return }
+        
+        let translation = gesture.translation(in: view)
+        
+        switch gesture.state {
+        case .began:
+            containerOriginalTransform = containerView.transform
+        case .changed:
+            // 只允许向下拖动
+            if translation.y > 0 {
+                let newTransform = CGAffineTransform(translationX: 0, y: translation.y)
+                containerView.transform = newTransform
+                
+                // 根据下拉距离调整背景透明度
+                let alpha = max(0.5 - translation.y / (view.bounds.height * 2), 0)
+                view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
+            }
+        case .ended, .cancelled:
+            guard let originalTransform = containerOriginalTransform else { return }
+            
+            if translation.y > dismissThreshold {
+                // 下拉距离超过阈值，关闭弹窗
+                hide(animated: true)
+            } else {
+                // 下拉距离不足，恢复原位
+                UIView.animate(withDuration: 0.2) {
+                    self.containerView.transform = originalTransform
+                    self.view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+                }
+            }
+        default:
+            break
+        }
+    }
+    
     // MARK: - 公共方法
     
     /// 添加按钮
@@ -563,7 +611,16 @@ public class ChimpionAlertAction {
 
 extension ChimpionAlertController: UIGestureRecognizerDelegate {
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer.isKind(of: UIPanGestureRecognizer.self),
+           preferredStyle == ChimpionAlertController.sheet {
+            return true
+        }
         return touch.view == view
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        // 允许同时识别多个手势
+        return true
     }
 }
 
