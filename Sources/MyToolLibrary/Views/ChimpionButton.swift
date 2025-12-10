@@ -8,20 +8,15 @@ public enum ImagePosition {
     case bottom // 图标在标题下方
 }
 
-public class ChimpionButton: UIButton {
+public class ChimpionButton: UIControl {
     
     // MARK: - 公共属性
-    
-    /// 按钮配置
-    private(set) var buttonConfiguration: UIButton.Configuration
     
     // MARK: - 初始化
     
     /// 使用指定的frame初始化按钮
     /// - Parameter frame: 按钮的初始框架
     public override init(frame: CGRect) {
-        // 初始化按钮配置
-        buttonConfiguration = UIButton.Configuration.plain()
         super.init(frame: frame)
         commonInit()
     }
@@ -29,8 +24,6 @@ public class ChimpionButton: UIButton {
     /// 使用编码器初始化按钮（用于Storyboard或XIB）
     /// - Parameter coder: NSCoder对象
     required public init?(coder: NSCoder) {
-        // 初始化按钮配置
-        buttonConfiguration = UIButton.Configuration.plain()
         super.init(coder: coder)
         commonInit()
     }
@@ -68,7 +61,7 @@ public class ChimpionButton: UIButton {
     /// - 控制图片在容器内的显示方式
     public var imageScaleMode: UIView.ContentMode = .scaleAspectFit {
         didSet {
-            imageView?.contentMode = imageScaleMode
+            imageView.contentMode = imageScaleMode
             setNeedsLayout()
         }
     }
@@ -78,28 +71,130 @@ public class ChimpionButton: UIButton {
     /// - 使用NSDirectionalEdgeInsets以支持RTL布局
     public var contentInsets: NSDirectionalEdgeInsets = .zero {
         didSet {
-            buttonConfiguration.contentInsets = contentInsets
             setNeedsLayout()
+        }
+    }
+    
+    /// 按钮的正常背景颜色
+    public override var backgroundColor: UIColor? {
+        get { super.backgroundColor }
+        set {
+            super.backgroundColor = newValue
+            // 当设置新的背景色时，更新正常背景色
+            if !isHighlighted {
+                normalColor = newValue
+            }
+        }
+    }
+    
+    /// 按钮按压时的背景颜色
+    /// - 如果不设置，默认会将正常背景色的透明度降低20%
+    public var highlightedBackgroundColor: UIColor?
+    
+    /// 按钮的高亮状态
+    /// - 当按钮被按压时，自动切换背景色
+    override public var isHighlighted: Bool {
+        didSet {
+            updateHighlightedState()
         }
     }
     
     // MARK: - 私有属性
     
     private var calculatedImageSize: CGSize = .zero
+    private var normalColor: UIColor?
+    
+    /// 更新按钮的高亮状态
+    private func updateHighlightedState() {
+        if isHighlighted {
+            // 确保normalColor已初始化
+            if normalColor == nil {
+                normalColor = super.backgroundColor
+            }
+            
+            // 设置高亮背景色
+            if let highlightedColor = highlightedBackgroundColor {
+                super.backgroundColor = highlightedColor
+            } else if let normalColor = normalColor {
+                // 默认将正常背景色的透明度降低20%
+                super.backgroundColor = normalColor.withAlphaComponent(0.5)
+            }
+        } else {
+            // 恢复正常背景色
+            if let color = normalColor {
+                super.backgroundColor = color
+            }
+        }
+    }
+    
+    /// 标题标签
+    public let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    /// 图片视图
+    public let imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    /// 按钮当前标题
+    public var title: String? {
+        get { titleLabel.text }
+        set { titleLabel.text = newValue }
+    }
+    
+    /// 按钮当前图片
+    public var image: UIImage? {
+        get { imageView.image }
+        set { imageView.image = newValue }
+    }
     
     /// 通用初始化方法
     /// - 设置按钮的基本属性和初始配置
     /// - 配置标题标签和图片视图的基本行为
     private func commonInit() {
-        // 设置配置
-        configuration = buttonConfiguration
+        // 添加标题和图片视图
+        addSubview(titleLabel)
+        addSubview(imageView)
+        
+        // 添加触摸事件
+        addTarget(self, action: #selector(touchDown), for: .touchDown)
+        addTarget(self, action: #selector(touchUpInside), for: .touchUpInside)
+        addTarget(self, action: #selector(touchUpOutside), for: .touchUpOutside)
+        addTarget(self, action: #selector(touchCancel), for: .touchCancel)
         
         // 确保标题和图片内容正确显示
-        titleLabel?.textAlignment = .center
-        titleLabel?.numberOfLines = 1
-        titleLabel?.lineBreakMode = .byTruncatingTail
-        imageView?.contentMode = imageScaleMode
-        imageView?.clipsToBounds = true
+        imageView.contentMode = imageScaleMode
+        
+        // 初始化正常背景色
+        normalColor = super.backgroundColor
+    }
+    
+    // MARK: - 触摸事件处理
+    
+    @objc private func touchDown() {
+        isHighlighted = true
+    }
+    
+    @objc private func touchUpInside() {
+        isHighlighted = false
+    }
+    
+    @objc private func touchUpOutside() {
+        isHighlighted = false
+    }
+    
+    @objc private func touchCancel() {
+        isHighlighted = false
     }
     
     // MARK: - 布局
@@ -110,14 +205,13 @@ public class ChimpionButton: UIButton {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        // 安全检查：确保imageView和titleLabel存在
-        guard let imageView = imageView, let titleLabel = titleLabel else { return }
+        // 安全检查：确保imageView和titleLabel存在（现在是非可选类型）
         
         // 确保有图片或标题时才进行调整
         if imageView.image == nil && titleLabel.text == nil { return }
         
-        // 获取配置中的内容边距
-        let insets = buttonConfiguration.contentInsets
+        // 获取内容边距
+        let insets = contentInsets
         
         // 计算可用的内容区域（减去内边距）
         let contentRect = bounds.inset(
@@ -157,18 +251,15 @@ public class ChimpionButton: UIButton {
     /// - 确保按钮能够完整显示所有内容
     /// - Returns: 按钮的最小所需尺寸
     public override var intrinsicContentSize: CGSize {
-        // 安全检查：确保imageView和titleLabel存在
-        guard let _ = imageView, let titleLabel = titleLabel else {
-            return super.intrinsicContentSize
-        }
+        // 安全检查：现在titleLabel是非可选类型
         
         // 计算图片的显示尺寸
         let imageSize = calculateImageSize(availableSize: bounds.size)
         // 获取标题的固有尺寸
         let titleSize = titleLabel.intrinsicContentSize
         
-        // 获取配置中的内容边距
-        let insets = buttonConfiguration.contentInsets
+        // 获取内容边距
+        let insets = contentInsets
         
         var width: CGFloat = 0
         var height: CGFloat = 0
@@ -200,7 +291,7 @@ public class ChimpionButton: UIButton {
     private func calculateImageSize(availableSize: CGSize) -> CGSize {
         // 安全检查：确保availableSize有效
         guard availableSize.width > 0 && availableSize.height > 0 else { return .zero }
-        guard let image = imageView?.image else { return .zero }
+        guard let image = imageView.image else { return .zero }
         
         // 确保image.size有效
         guard image.size.width > 0 && image.size.height > 0 else { return .zero }
@@ -243,7 +334,6 @@ public class ChimpionButton: UIButton {
     /// - Returns: 计算后的标题尺寸
     /// - 根据图片位置计算剩余可用空间，并确保标题不会超出边界
     private func calculateTitleSize(availableSize: CGSize, imageSize: CGSize) -> CGSize {
-        guard let titleLabel = titleLabel else { return .zero }
         
         let maxTitleSize: CGSize
         switch imagePosition {
@@ -317,7 +407,6 @@ public class ChimpionButton: UIButton {
     ///   - imageSize: 图片尺寸
     /// - 图片在左，文字在右，两者垂直居中对齐
     private func layoutImageLeft(contentRect: CGRect, titleSize: CGSize, imageSize: CGSize) {
-        guard let imageView = imageView, let titleLabel = titleLabel else { return }
         
         let totalWidth = imageSize.width + spacing + titleSize.width
         let startX = contentRect.minX + max((contentRect.width - totalWidth) / 2, 0)
@@ -345,7 +434,6 @@ public class ChimpionButton: UIButton {
     ///   - imageSize: 图片尺寸
     /// - 文字在左，图片在右，两者垂直居中对齐
     private func layoutImageRight(contentRect: CGRect, titleSize: CGSize, imageSize: CGSize) {
-        guard let imageView = imageView, let titleLabel = titleLabel else { return }
         
         let totalWidth = imageSize.width + spacing + titleSize.width
         let startX = contentRect.minX + max((contentRect.width - totalWidth) / 2, 0)
@@ -373,7 +461,6 @@ public class ChimpionButton: UIButton {
     ///   - imageSize: 图片尺寸
     /// - 图片在上，文字在下，两者水平居中对齐
     private func layoutImageTop(contentRect: CGRect, titleSize: CGSize, imageSize: CGSize) {
-        guard let imageView = imageView, let titleLabel = titleLabel else { return }
         
         let totalHeight = imageSize.height + spacing + titleSize.height
         let startY = contentRect.minY + max((contentRect.height - totalHeight) / 2, 0)
@@ -401,7 +488,6 @@ public class ChimpionButton: UIButton {
     ///   - imageSize: 图片尺寸
     /// - 文字在上，图片在下，两者水平居中对齐
     private func layoutImageBottom(contentRect: CGRect, titleSize: CGSize, imageSize: CGSize) {
-        guard let imageView = imageView, let titleLabel = titleLabel else { return }
         
         let totalHeight = imageSize.height + spacing + titleSize.height
         let startY = contentRect.minY + max((contentRect.height - totalHeight) / 2, 0)
@@ -432,8 +518,8 @@ public class ChimpionButton: UIButton {
     ///   - spacing: 间距
     ///   - maxImageSize: 图片最大尺寸
     public func set(title: String?, image: UIImage?, position: ImagePosition = .left, spacing: CGFloat = 8, maxImageSize: CGSize? = nil) {
-        setTitle(title, for: .normal)
-        setImage(image, for: .normal)
+        self.title = title
+        self.image = image
         self.imagePosition = position
         self.spacing = spacing
         
@@ -466,5 +552,52 @@ public class ChimpionButton: UIButton {
     public func removeMaxImageSize() {
         maxImageSize = nil
         setNeedsLayout()
+    }
+    
+    // MARK: - UIButton兼容方法
+    
+    /// 设置按钮标题（兼容UIButton API）
+    /// - Parameters:
+    ///   - title: 标题字符串
+    ///   - state: 按钮状态（UIControl.State）
+    public func setTitle(_ title: String?, for state: UIControl.State) {
+        self.title = title
+    }
+    
+    /// 获取按钮标题（兼容UIButton API）
+    /// - Parameter state: 按钮状态（UIControl.State）
+    /// - Returns: 标题字符串
+    public func title(for state: UIControl.State) -> String? {
+        return self.title
+    }
+    
+    /// 设置按钮图片（兼容UIButton API）
+    /// - Parameters:
+    ///   - image: 图片对象
+    ///   - state: 按钮状态（UIControl.State）
+    public func setImage(_ image: UIImage?, for state: UIControl.State) {
+        self.image = image
+    }
+    
+    /// 获取按钮图片（兼容UIButton API）
+    /// - Parameter state: 按钮状态（UIControl.State）
+    /// - Returns: 图片对象
+    public func image(for state: UIControl.State) -> UIImage? {
+        return self.image
+    }
+    
+    /// 设置按钮标题颜色（兼容UIButton API）
+    /// - Parameters:
+    ///   - color: 标题颜色
+    ///   - state: 按钮状态（UIControl.State）
+    public func setTitleColor(_ color: UIColor?, for state: UIControl.State) {
+        titleLabel.textColor = color
+    }
+    
+    /// 获取按钮标题颜色（兼容UIButton API）
+    /// - Parameter state: 按钮状态（UIControl.State）
+    /// - Returns: 标题颜色
+    public func titleColor(for state: UIControl.State) -> UIColor? {
+        return titleLabel.textColor
     }
 }

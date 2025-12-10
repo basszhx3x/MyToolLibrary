@@ -40,7 +40,7 @@ class ButtonControllerTestViewController: UIViewController {
     private func createTestButtons() {
         // 顶部图标按钮
         let topIconButton = ChimpionButton()
-        topIconButton.setTitle("顶部图标", for: .normal)
+        topIconButton.setTitle("顶部图标"+"顶部图标", for: .normal)
         topIconButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
         topIconButton.translatesAutoresizingMaskIntoConstraints = false
         topIconButton.setTitleColor(.black, for: .normal)
@@ -115,7 +115,7 @@ class ButtonControllerTestViewController: UIViewController {
         ])
     }
     
-    @objc private func buttonTapped(_ sender: UIButton) {
-        print("按钮点击: \(sender.titleLabel?.text ?? "未命名按钮")")
+    @objc private func buttonTapped(_ sender: ChimpionButton) {
+        print("按钮点击: \(sender.titleLabel.text ?? "未命名按钮")")
     }
 }
