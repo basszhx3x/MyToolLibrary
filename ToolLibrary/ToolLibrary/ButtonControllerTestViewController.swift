@@ -113,9 +113,85 @@ class ButtonControllerTestViewController: UIViewController {
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+        
+        // 创建选中状态测试按钮
+        createSelectedStateTestButtons()
+    }
+    
+    // 创建选中状态测试按钮
+    private func createSelectedStateTestButtons() {
+        // 选中背景色测试按钮
+        let selectedBgButton = ChimpionButton()
+        selectedBgButton.setTitle("选中背景色", for: .normal)
+        selectedBgButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
+        selectedBgButton.translatesAutoresizingMaskIntoConstraints = false
+        selectedBgButton.setTitleColor(.black, for: .normal)
+        selectedBgButton.backgroundColor = .systemRed.withAlphaComponent(0.2)
+        selectedBgButton.selectedBackgroundColor = .systemRed.withAlphaComponent(0.8) // 设置选中背景色
+        selectedBgButton.layer.cornerRadius = 12
+        selectedBgButton.imagePosition = .left
+        selectedBgButton.spacing = 8
+        selectedBgButton.addTarget(self, action: #selector(toggleSelectedState(_:)), for: .touchUpInside)
+        
+        // 选中图片测试按钮
+        let selectedImageButton = ChimpionButton()
+        selectedImageButton.setTitle("选中图片", for: .normal)
+        selectedImageButton.setImage(UIImage(systemName: "star"), for: .normal) // 未选中时为空心星
+        selectedImageButton.selectedImage = UIImage(systemName: "star.fill") // 选中时为实心星
+        selectedImageButton.translatesAutoresizingMaskIntoConstraints = false
+        selectedImageButton.setTitleColor(.black, for: .normal)
+        selectedImageButton.backgroundColor = .systemYellow.withAlphaComponent(0.2)
+        selectedImageButton.layer.cornerRadius = 12
+        selectedImageButton.imagePosition = .left
+        selectedImageButton.spacing = 8
+        selectedImageButton.addTarget(self, action: #selector(toggleSelectedState(_:)), for: .touchUpInside)
+        
+        // 选中背景色和图片测试按钮
+        let selectedBothButton = ChimpionButton()
+        selectedBothButton.setTitle("选中背景和图片", for: .normal)
+        selectedBothButton.setImage(UIImage(systemName: "checkmark"), for: .normal) // 未选中时为空心对勾
+        selectedBothButton.selectedImage = UIImage(systemName: "checkmark.circle.fill") // 选中时为实心对勾
+        selectedBothButton.translatesAutoresizingMaskIntoConstraints = false
+        selectedBothButton.setTitleColor(.black, for: .normal)
+        selectedBothButton.backgroundColor = .systemGreen.withAlphaComponent(0.2)
+        selectedBothButton.selectedBackgroundColor = .systemGreen.withAlphaComponent(0.8) // 设置选中背景色
+        selectedBothButton.layer.cornerRadius = 12
+        selectedBothButton.imagePosition = .left
+        selectedBothButton.spacing = 8
+        selectedBothButton.addTarget(self, action: #selector(toggleSelectedState(_:)), for: .touchUpInside)
+        
+        // 创建选中状态测试栈视图
+        let selectedStackView = UIStackView(arrangedSubviews: [selectedBgButton, selectedImageButton, selectedBothButton])
+        selectedStackView.axis = .vertical
+        selectedStackView.spacing = 20
+        selectedStackView.alignment = .center
+        selectedStackView.distribution = .fillProportionally
+        selectedStackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(selectedStackView)
+        
+        // 设置选中状态测试按钮尺寸和约束
+        NSLayoutConstraint.activate([
+            selectedBgButton.widthAnchor.constraint(equalToConstant: 200),
+            selectedBgButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            selectedImageButton.widthAnchor.constraint(equalToConstant: 200),
+            selectedImageButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            selectedBothButton.widthAnchor.constraint(equalToConstant: 200),
+            selectedBothButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            // 设置选中状态测试栈视图约束
+            selectedStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 200),
+            selectedStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
     }
     
     @objc private func buttonTapped(_ sender: ChimpionButton) {
         print("按钮点击: \(sender.titleLabel.text ?? "未命名按钮")")
+    }
+    
+    @objc private func toggleSelectedState(_ sender: ChimpionButton) {
+        sender.isSelected.toggle()
+        print("按钮 \(sender.titleLabel.text ?? "未命名按钮") 选中状态: \(sender.isSelected)")
     }
 }

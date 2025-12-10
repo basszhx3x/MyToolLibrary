@@ -91,11 +91,23 @@ public class ChimpionButton: UIControl {
     /// - 如果不设置，默认会将正常背景色的透明度降低20%
     public var highlightedBackgroundColor: UIColor?
     
+    /// 按钮选中时的背景颜色
+    /// - 如果不设置，默认使用正常背景色
+    public var selectedBackgroundColor: UIColor?
+    
     /// 按钮的高亮状态
     /// - 当按钮被按压时，自动切换背景色
     override public var isHighlighted: Bool {
         didSet {
-            updateHighlightedState()
+            updateVisualState()
+        }
+    }
+    
+    /// 按钮的选中状态
+    /// - 当按钮被选中时，自动切换背景色
+    override public var isSelected: Bool {
+        didSet {
+            updateVisualState()
         }
     }
     
@@ -104,26 +116,44 @@ public class ChimpionButton: UIControl {
     private var calculatedImageSize: CGSize = .zero
     private var normalColor: UIColor?
     
-    /// 更新按钮的高亮状态
-    private func updateHighlightedState() {
+    /// 更新按钮的视觉状态
+    private func updateVisualState() {
+        // 确保normalColor和normalImage已初始化
+        if normalColor == nil {
+            normalColor = super.backgroundColor
+        }
+        if normalImage == nil {
+            normalImage = imageView.image
+        }
+        
+        // 优先级：高亮状态 > 选中状态 > 正常状态
         if isHighlighted {
-            // 确保normalColor已初始化
-            if normalColor == nil {
-                normalColor = super.backgroundColor
-            }
-            
-            // 设置高亮背景色
+            // 高亮状态
             if let highlightedColor = highlightedBackgroundColor {
                 super.backgroundColor = highlightedColor
             } else if let normalColor = normalColor {
                 // 默认将正常背景色的透明度降低20%
                 super.backgroundColor = normalColor.withAlphaComponent(0.5)
             }
+            // 高亮状态使用正常图片
+            imageView.image = normalImage
+        } else if isSelected {
+            // 选中状态
+            if let selectedColor = selectedBackgroundColor {
+                super.backgroundColor = selectedColor
+            } else if let normalColor = normalColor {
+                // 默认使用正常背景色
+                super.backgroundColor = normalColor
+            }
+            // 选中状态使用选中图片，如果没有则使用正常图片
+            imageView.image = selectedImage ?? normalImage
         } else {
-            // 恢复正常背景色
+            // 正常状态
             if let color = normalColor {
                 super.backgroundColor = color
             }
+            // 正常状态使用正常图片
+            imageView.image = normalImage
         }
     }
     
@@ -155,8 +185,21 @@ public class ChimpionButton: UIControl {
     /// 按钮当前图片
     public var image: UIImage? {
         get { imageView.image }
-        set { imageView.image = newValue }
+        set {
+            imageView.image = newValue
+            // 当设置新的图片时，更新正常状态的图片
+            if !isSelected {
+                normalImage = newValue
+            }
+        }
     }
+    
+    /// 按钮选中状态的图片
+    public var selectedImage: UIImage?
+    
+    /// 按钮正常状态的图片（用于内部存储）
+    private var normalImage: UIImage?
+    
     
     /// 通用初始化方法
     /// - 设置按钮的基本属性和初始配置
@@ -175,8 +218,9 @@ public class ChimpionButton: UIControl {
         // 确保标题和图片内容正确显示
         imageView.contentMode = imageScaleMode
         
-        // 初始化正常背景色
+        // 初始化正常背景色和正常图片
         normalColor = super.backgroundColor
+        normalImage = imageView.image
     }
     
     // MARK: - 触摸事件处理
