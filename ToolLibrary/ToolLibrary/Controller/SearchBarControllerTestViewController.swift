@@ -70,6 +70,10 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
         
         // 测试光标设置功能
         searchBarView.searchTextFieldCursorColor = .systemRed
+        
+        // 测试取消按钮样式设置
+        searchBarView.cancelButtonTitle = "取消"
+        searchBarView.cancelButtonTitleColor = .systemBlue
     }
     
     private func configureResultLabel() {
@@ -182,6 +186,10 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
             
             // 自定义光标样式
             searchBarView.searchTextFieldCursorColor = .systemYellow
+            
+            // 自定义取消按钮样式
+            searchBarView.cancelButtonTitle = "关闭"
+            searchBarView.cancelButtonTitleColor = .systemYellow
         } else {
             // 恢复默认样式
             searchBarView.searchBarHeight = 70.0
@@ -206,6 +214,10 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
             
             // 恢复默认光标样式
             searchBarView.searchTextFieldCursorColor = .systemRed
+            
+            // 恢复默认取消按钮样式
+            searchBarView.cancelButtonTitle = "取消"
+            searchBarView.cancelButtonTitleColor = .systemBlue
         }
     }
 }

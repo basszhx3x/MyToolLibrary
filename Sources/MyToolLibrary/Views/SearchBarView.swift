@@ -101,6 +101,20 @@ public class SearchBarView: UIView {
         }
     }
     
+    // 取消按钮标题
+    public var cancelButtonTitle: String = "取消" {
+        didSet {
+            cancelButton.setTitle(cancelButtonTitle, for: .normal)
+        }
+    }
+    
+    // 取消按钮标题颜色
+    public var cancelButtonTitleColor: UIColor = .systemBlue {
+        didSet {
+            cancelButton.setTitleColor(cancelButtonTitleColor, for: .normal)
+        }
+    }
+    
     // 搜索文本
     public var text: String? {
         get { return searchBar.text }
@@ -275,8 +289,8 @@ public class SearchBarView: UIView {
     
     private func configureCancelButton() {
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.setTitle("取消", for: .normal)
-        cancelButton.setTitleColor(.systemBlue, for: .normal)
+        cancelButton.setTitle(cancelButtonTitle, for: .normal)
+        cancelButton.setTitleColor(cancelButtonTitleColor, for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
     }
