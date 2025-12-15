@@ -61,14 +61,15 @@ class SearchBarControllerTestViewController: UIViewController, UITextFieldDelega
         searchBarView.searchTextFieldCornerRadius = 10
 
         searchBarView.searchTextFieldHeight = 50
+        searchBarView.searchTextFieldMargins = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
+
         searchBarView.showsCancelButton = false
         searchBarView.showsBottomSeparator = true
         searchBarView.bottomSeparatorColor = .separator
-        
         // 测试新功能：搜索图标配置
         searchBarView.searchIcon = UIImage(systemName: "magnifyingglass")
         searchBarView.searchIconTintColor = .systemGray
-        searchBarView.searchIconPadding = 8
+        searchBarView.searchIconPadding = 10
         
         // 测试新功能：文本框边缘间距配置
 //        searchBarView.searchTextFieldMargins = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)

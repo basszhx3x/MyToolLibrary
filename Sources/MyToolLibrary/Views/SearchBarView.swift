@@ -107,7 +107,7 @@ public class SearchBarView: UIView {
     
     // 搜索文本框边缘间距
     // 搜索文本框外部边距（相对于父视图）
-    public var searchTextFieldMargins: UIEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8) {
+    public var searchTextFieldMargins: UIEdgeInsets = .zero {
         didSet {
             isTextFieldMarginsCustomized = true
             updateSearchTextFieldConstraints()
@@ -118,7 +118,7 @@ public class SearchBarView: UIView {
     private var isTextFieldMarginsCustomized = false
     
     // 搜索文本框内部边距
-    public var searchViewEdgeInsets: UIEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8) {
+    public var searchViewEdgeInsets: UIEdgeInsets = .zero {
         didSet {
             updateSearchViewEdgeInsets()
         }
@@ -392,20 +392,39 @@ public class SearchBarView: UIView {
         // 根据用户是否显式设置了margins来决定使用哪种布局方式
         if isTextFieldMarginsCustomized {
             // 使用edges布局，设置top/bottom/leading/trailing约束
+            let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+            searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+            let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+            searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
+            
+            // 降低垂直约束优先级，避免在高度为0时冲突
+            let searchTextFieldTopConstraint = internalSearchTextField.topAnchor.constraint(equalTo: self.topAnchor, constant: searchTextFieldMargins.top)
+            searchTextFieldTopConstraint.priority = .defaultHigh
+            let searchTextFieldBottomConstraint = internalSearchTextField.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -searchTextFieldMargins.bottom)
+            searchTextFieldBottomConstraint.priority = .defaultHigh
+            
             NSLayoutConstraint.activate([
-                internalSearchTextField.topAnchor.constraint(equalTo: self.topAnchor, constant: searchTextFieldMargins.top),
-                internalSearchTextField.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -searchTextFieldMargins.bottom),
-                internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldTopConstraint,
+                searchTextFieldBottomConstraint,
+                searchTextFieldLeadingConstraint,
+                searchTextFieldTrailingConstraint
             ])
         } else {
-            // 使用高度约束和centerX/Y布局
+            // 使用高度约束和centerY布局，不使用centerX以避免与leading/trailing约束冲突
+            let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+            searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+            let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+            searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
+            
+            // 降低高度约束优先级，避免在高度为0时冲突
+            let searchTextFieldHeightConstraint = internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight)
+            searchTextFieldHeightConstraint.priority = .defaultHigh
+            
             NSLayoutConstraint.activate([
-                internalSearchTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor),
                 internalSearchTextField.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight),
-                internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldHeightConstraint,
+                searchTextFieldLeadingConstraint,
+                searchTextFieldTrailingConstraint
             ])
         }
     }
@@ -419,7 +438,9 @@ public class SearchBarView: UIView {
         }
         
         // 添加新的高度约束
-        heightAnchor.constraint(equalToConstant: searchBarHeight).isActive = true
+        let heightConstraint = heightAnchor.constraint(equalToConstant: searchBarHeight)
+        heightConstraint.priority = .defaultHigh // 降低高度约束优先级，避免与系统临时布局约束冲突
+        heightConstraint.isActive = true
         
         // 更新搜索文本框的宽度和高度约束
         updateSearchTextFieldWidth()
@@ -462,8 +483,10 @@ public class SearchBarView: UIView {
                 }
             }
             
-            // 设置新的高度约束
-            textField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight).isActive = true
+            // 设置新的高度约束并降低优先级，避免在高度为0时冲突
+            let heightConstraint = textField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight)
+            heightConstraint.priority = .defaultHigh
+            heightConstraint.isActive = true
             
             textField.setNeedsLayout()
             textField.layoutIfNeeded()
@@ -488,19 +511,36 @@ public class SearchBarView: UIView {
             // 根据用户是否显式设置了margins来决定使用哪种布局方式
             if isTextFieldMarginsCustomized {
                 // 使用edges布局，设置top/bottom/leading/trailing约束
+                let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+                searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+                let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
+                
+                // 降低垂直约束优先级，避免在高度为0时冲突
+                let searchTextFieldTopConstraint = internalSearchTextField.topAnchor.constraint(equalTo: topAnchor, constant: searchTextFieldMargins.top)
+                searchTextFieldTopConstraint.priority = .defaultHigh
+                let searchTextFieldBottomConstraint = internalSearchTextField.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -searchTextFieldMargins.bottom)
+                searchTextFieldBottomConstraint.priority = .defaultHigh
+                
                 NSLayoutConstraint.activate([
-                    internalSearchTextField.topAnchor.constraint(equalTo: topAnchor, constant: searchTextFieldMargins.top),
-                    internalSearchTextField.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -searchTextFieldMargins.bottom),
+                    searchTextFieldTopConstraint,
+                    searchTextFieldBottomConstraint,
+                    searchTextFieldLeadingConstraint,
+                    searchTextFieldTrailingConstraint,
                     internalSearchTextField.widthAnchor.constraint(equalToConstant: width),
                     internalSearchTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor)
                 ])
             } else {
                 // 使用高度约束和centerX/Y布局
+                // 降低高度约束优先级，避免在高度为0时冲突
+                let searchTextFieldHeightConstraint = internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight)
+                searchTextFieldHeightConstraint.priority = .defaultHigh
+                
                 NSLayoutConstraint.activate([
                     internalSearchTextField.widthAnchor.constraint(equalToConstant: width),
                     internalSearchTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor),
                     internalSearchTextField.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                    internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight)
+                    searchTextFieldHeightConstraint
                 ])
             }
         } else {
@@ -508,20 +548,27 @@ public class SearchBarView: UIView {
             // 根据用户是否显式设置了margins来决定使用哪种布局方式
             if isTextFieldMarginsCustomized {
                 // 使用edges布局，设置top/bottom/leading/trailing约束
+                let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+                searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+                let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
                 NSLayoutConstraint.activate([
                     internalSearchTextField.topAnchor.constraint(equalTo: topAnchor, constant: searchTextFieldMargins.top),
                     internalSearchTextField.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -searchTextFieldMargins.bottom),
-                    internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                    internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                    searchTextFieldLeadingConstraint,
+                    searchTextFieldTrailingConstraint
                 ])
             } else {
-                // 使用高度约束和centerX/Y布局
+                // 使用高度约束和centerY布局，不使用centerX以避免与leading/trailing约束冲突
+                let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+                searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+                let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
                 NSLayoutConstraint.activate([
-                    internalSearchTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor),
                     internalSearchTextField.centerYAnchor.constraint(equalTo: self.centerYAnchor),
                     internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight),
-                    internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                    internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                    searchTextFieldLeadingConstraint,
+                    searchTextFieldTrailingConstraint
                 ])
             }
         }
@@ -580,14 +627,20 @@ public class SearchBarView: UIView {
         internalSearchTextField.translatesAutoresizingMaskIntoConstraints = false
         
         // 搜索栏高度约束
-        self.heightAnchor.constraint(equalToConstant: searchBarHeight).isActive = true
+        let heightConstraint = self.heightAnchor.constraint(equalToConstant: searchBarHeight)
+        heightConstraint.priority = .defaultHigh // 降低高度约束优先级，避免与系统临时布局约束冲突
+        heightConstraint.isActive = true
         
         // 取消按钮约束
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        let cancelButtonWidthConstraint = cancelButton.widthAnchor.constraint(equalToConstant: 60)
+        cancelButtonWidthConstraint.priority = .defaultHigh // 降低宽度约束优先级，避免在窄宽度下冲突
+        let cancelButtonTrailingConstraint = cancelButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8)
+        cancelButtonTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时与搜索文本框约束冲突
         NSLayoutConstraint.activate([
-            cancelButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
+            cancelButtonTrailingConstraint,
             cancelButton.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-            cancelButton.widthAnchor.constraint(equalToConstant: 60)
+            cancelButtonWidthConstraint
         ])
         
         // 底部分割线约束
@@ -602,20 +655,39 @@ public class SearchBarView: UIView {
         // 根据用户是否显式设置了margins来决定使用哪种布局方式
         if isTextFieldMarginsCustomized {
             // 使用edges布局，设置top/bottom/leading/trailing约束
+            let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+            searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+            let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+            searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
+            
+            // 降低垂直约束优先级，避免在高度为0时冲突
+            let searchTextFieldTopConstraint = internalSearchTextField.topAnchor.constraint(equalTo: self.topAnchor, constant: searchTextFieldMargins.top)
+            searchTextFieldTopConstraint.priority = .defaultHigh
+            let searchTextFieldBottomConstraint = internalSearchTextField.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -searchTextFieldMargins.bottom)
+            searchTextFieldBottomConstraint.priority = .defaultHigh
+            
             NSLayoutConstraint.activate([
-                internalSearchTextField.topAnchor.constraint(equalTo: self.topAnchor, constant: searchTextFieldMargins.top),
-                internalSearchTextField.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -searchTextFieldMargins.bottom),
-                internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldTopConstraint,
+                searchTextFieldBottomConstraint,
+                searchTextFieldLeadingConstraint,
+                searchTextFieldTrailingConstraint
             ])
         } else {
-            // 使用高度约束和centerX/Y布局
+            // 使用高度约束和centerY布局，不使用centerX以避免与leading/trailing约束冲突
+            let searchTextFieldLeadingConstraint = internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left)
+            searchTextFieldLeadingConstraint.priority = .defaultHigh // 降低leading约束优先级，避免在宽度为0时冲突
+            let searchTextFieldTrailingConstraint = internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+            searchTextFieldTrailingConstraint.priority = .defaultHigh // 降低trailing约束优先级，避免在宽度为0时冲突
+            
+            // 降低高度约束优先级，避免在高度为0时冲突
+            let searchTextFieldHeightConstraint = internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight)
+            searchTextFieldHeightConstraint.priority = .defaultHigh
+            
             NSLayoutConstraint.activate([
-                internalSearchTextField.centerXAnchor.constraint(equalTo: self.centerXAnchor),
                 internalSearchTextField.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-                internalSearchTextField.heightAnchor.constraint(equalToConstant: searchTextFieldHeight),
-                internalSearchTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: searchTextFieldMargins.left),
-                internalSearchTextField.trailingAnchor.constraint(equalTo: cancelButton.leadingAnchor, constant: -searchTextFieldMargins.right)
+                searchTextFieldHeightConstraint,
+                searchTextFieldLeadingConstraint,
+                searchTextFieldTrailingConstraint
             ])
         }
         
