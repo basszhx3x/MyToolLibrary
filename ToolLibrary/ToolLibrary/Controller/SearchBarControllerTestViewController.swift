@@ -8,7 +8,7 @@
 import UIKit
 import ChimpionTools
 
-class SearchBarControllerTestViewController: UIViewController, UISearchBarDelegate {
+class SearchBarControllerTestViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Properties
     
@@ -52,18 +52,26 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
         
         // 显示清除按钮和取消按钮
         searchBarView.showsClearButton = true
-        searchBarView.showsCancelButton = true
-        
         // 测试新增属性 - 默认样式
         searchBarView.searchBarHeight = 70.0
         searchBarView.searchBarBackgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
         
         // searchBarView.searchTextFieldWidth = 120
         searchBarView.searchTextFieldBackgroundColor = UIColor.white
-//        searchBarView.searchTextFieldCornerRadius = 12.0
-//        searchBarView.searchTextFieldBorderColor = UIColor.lightGray
-//        searchBarView.searchTextFieldBorderWidth = 1.0
-        searchBarView.searchTextFieldHeight = 46
+        searchBarView.searchTextFieldCornerRadius = 10
+
+        searchBarView.searchTextFieldHeight = 50
+        searchBarView.showsCancelButton = false
+        searchBarView.showsBottomSeparator = true
+        searchBarView.bottomSeparatorColor = .separator
+        
+        // 测试新功能：搜索图标配置
+        searchBarView.searchIcon = UIImage(systemName: "magnifyingglass")
+        searchBarView.searchIconTintColor = .systemGray
+        searchBarView.searchIconPadding = 8
+        
+        // 测试新功能：文本框边缘间距配置
+//        searchBarView.searchTextFieldMargins = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
         
         // 测试点击输入框功能：点击搜索栏区域可以激活输入框
         // 测试取消按钮居中：观察取消按钮是否在搜索栏的垂直中心位置
@@ -129,32 +137,45 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
     
     // MARK: - UISearchBarDelegate
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // 更新结果标签
-        if searchText.isEmpty {
+        let currentText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string) ?? string
+        if currentText.isEmpty {
             resultLabel.text = "搜索结果将显示在这里"
             resultLabel.textColor = .gray
         } else {
-            resultLabel.text = "搜索内容: \(searchText)"
+            resultLabel.text = "搜索内容: \(currentText)"
             resultLabel.textColor = .black
         }
+        return true
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // 结束编辑
-        searchBar.resignFirstResponder()
-        
+        textField.resignFirstResponder()
+        searchBarView.showsCancelButton = false
         // 更新结果标签
-        if let searchText = searchBar.text, !searchText.isEmpty {
+        if let searchText = textField.text, !searchText.isEmpty {
             resultLabel.text = "搜索完成: \(searchText)"
             resultLabel.textColor = .systemGreen
         }
+        return true
     }
     
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        searchBarView.showsCancelButton = true
+    }
+    
+    
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        searchBarView.showsCancelButton = false
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
         // 清空结果标签
         resultLabel.text = "搜索结果将显示在这里"
         resultLabel.textColor = .gray
+        return true
     }
     
     // MARK: - Actions
@@ -190,6 +211,14 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
             // 自定义取消按钮样式
             searchBarView.cancelButtonTitle = "关闭"
             searchBarView.cancelButtonTitleColor = .systemYellow
+            
+            // 自定义搜索图标配置
+            searchBarView.searchIcon = UIImage(systemName: "search")
+            searchBarView.searchIconTintColor = .systemYellow
+            searchBarView.searchIconPadding = 15.0
+            
+            // 自定义文本框边缘间距配置
+            searchBarView.searchViewEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
         } else {
             // 恢复默认样式
             searchBarView.searchBarHeight = 70.0
@@ -218,6 +247,14 @@ class SearchBarControllerTestViewController: UIViewController, UISearchBarDelega
             // 恢复默认取消按钮样式
             searchBarView.cancelButtonTitle = "取消"
             searchBarView.cancelButtonTitleColor = .systemBlue
+            
+            // 恢复默认搜索图标配置
+            searchBarView.searchIcon = UIImage(systemName: "magnifyingglass")
+            searchBarView.searchIconTintColor = .systemGray
+            searchBarView.searchIconPadding = 10.0
+            
+            // 恢复默认文本框边缘间距配置
+            searchBarView.searchViewEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         }
     }
 }
