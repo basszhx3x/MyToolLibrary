@@ -324,9 +324,6 @@ public class SearchBarView: UIView {
         updateBottomSeparatorVisibility()
         updateBottomSeparatorColor()
         updateBottomSeparatorHeight()
-        
-        // 添加点击手势以唤起输入框
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
     }
     
     // MARK: - Configuration
@@ -496,9 +493,9 @@ public class SearchBarView: UIView {
     private func updateSearchTextFieldWidth() {
         // 移除所有与搜索文本框相关的宽度和水平位置约束
         constraints.forEach { constraint in
-            if (constraint.firstItem as? UITextField == internalSearchTextField || 
+            if (constraint.firstItem as? UITextField == internalSearchTextField ||
                 constraint.secondItem as? UITextField == internalSearchTextField) &&
-               (constraint.firstAttribute == .width || constraint.firstAttribute == .leading || 
+               (constraint.firstAttribute == .width || constraint.firstAttribute == .leading ||
                 constraint.firstAttribute == .trailing || constraint.firstAttribute == .centerX ||
                 constraint.firstAttribute == .top || constraint.firstAttribute == .bottom ||
                 constraint.firstAttribute == .centerY) {
@@ -729,22 +726,5 @@ public class SearchBarView: UIView {
         return internalSearchTextField.resignFirstResponder()
     }
     
-    // MARK: - Gesture Handling
-    
-    @objc private func handleTap() {
-        // 点击组件时唤起输入框
-        becomeFirstResponder()
-    }
-    
-    // 确保点击事件能正确传递给searchTextField
-    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        // 先检查是否点击了取消按钮
-        let cancelButtonView = cancelButton.hitTest(convert(point, to: cancelButton), with: event)
-        if cancelButtonView != nil {
-            return cancelButtonView
-        }
-        
-        // 如果点击了组件的其他部分，传递给searchTextField
-        return internalSearchTextField.hitTest(convert(point, to: internalSearchTextField), with: event)
-    }
 }
+

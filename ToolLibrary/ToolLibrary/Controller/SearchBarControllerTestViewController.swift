@@ -18,7 +18,9 @@ class SearchBarControllerTestViewController: UIViewController, UITextFieldDelega
     private var isCustomStyle = false
     
     // MARK: - View Lifecycle
-    
+    @objc private func tapHandle() {
+        view.endEditing(true)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -27,7 +29,10 @@ class SearchBarControllerTestViewController: UIViewController, UITextFieldDelega
         
         // 设置视图背景色
         view.backgroundColor = .white
-        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapHandle))
+        tap.delegate = self
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
         // 配置搜索栏视图
         configureSearchBarView()
         
@@ -257,5 +262,15 @@ class SearchBarControllerTestViewController: UIViewController, UITextFieldDelega
             // 恢复默认文本框边缘间距配置
             searchBarView.searchViewEdgeInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
         }
+    }
+}
+
+extension SearchBarControllerTestViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        let location = gestureRecognizer.location(in: view)
+        if searchBarView.frame.contains(location) {
+            return false
+        }
+        return true
     }
 }
