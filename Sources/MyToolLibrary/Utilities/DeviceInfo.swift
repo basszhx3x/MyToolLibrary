@@ -43,6 +43,37 @@ public struct DeviceInfo {
     public static var buildVersion: String {
         return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
     }
+    
+    /// 判断是否为iPad设备
+    /// 
+    /// 通过设备的用户界面风格判断是否为iPad设备
+    /// - Returns: 如果是iPad设备返回true，否则返回false
+    public static var isIPad: Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
+    /// 判断是否为iPhone X及以后的全面屏设备
+    /// 
+    /// 通过检查设备的安全区域底部高度来判断是否为全面屏设备
+    /// - Returns: 如果是全面屏设备返回true，否则返回false
+    public static var isIPhoneX: Bool {
+        // iPhone X及以后的全面屏设备底部安全区域高度大于0
+        let window = UIApplication.shared.windows.first
+        return UIDevice.current.userInterfaceIdiom == .phone && (window?.safeAreaInsets.bottom ?? 0) > 0
+    }
+    
+    /// 判断是否处于分屏模式
+    /// 
+    /// 通过检查当前窗口的尺寸是否小于屏幕的完整尺寸来判断是否处于分屏模式
+    /// - Returns: 如果处于分屏模式返回true，否则返回false
+    public static var isSplitScreen: Bool {
+        guard let window = UIApplication.shared.windows.first else { return false }
+        let screenSize = UIScreen.main.bounds.size
+        let windowSize = window.bounds.size
+        
+        // 检查窗口是否小于屏幕的完整尺寸
+        return windowSize.width < screenSize.width || windowSize.height < screenSize.height
+    }
 }
 
 /// UIDevice扩展
