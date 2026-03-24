@@ -274,8 +274,8 @@ public class SearchBarView: UIView {
     }
     
     // 委托
-    public weak var delegate: UITextFieldDelegate? {
-        get { return internalSearchTextField.delegate }
+    public weak var delegate: chimpionTextFieldDelegate? {
+        get { return internalSearchTextField.delegate as? any chimpionTextFieldDelegate }
         set { internalSearchTextField.delegate = newValue }
     }
     
@@ -713,7 +713,7 @@ public class SearchBarView: UIView {
         internalSearchTextField.resignFirstResponder()
         
         // 通知委托
-        delegate?.textFieldShouldReturn?(internalSearchTextField)
+        delegate?.textFieldDidTapCancel(internalSearchTextField)
     }
     
     // 聚焦搜索文本框
@@ -726,5 +726,11 @@ public class SearchBarView: UIView {
         return internalSearchTextField.resignFirstResponder()
     }
     
+}
+
+
+public protocol chimpionTextFieldDelegate: UITextFieldDelegate {
+    
+    func textFieldDidTapCancel(_ textField: UITextField)
 }
 
