@@ -729,8 +729,14 @@ public class SearchBarView: UIView {
 }
 
 
-public protocol chimpionTextFieldDelegate: UITextFieldDelegate {
+@MainActor public protocol chimpionTextFieldDelegate: UITextFieldDelegate {
     
     func textFieldDidTapCancel(_ textField: UITextField)
 }
 
+extension chimpionTextFieldDelegate {
+    
+    func textFieldDidTapCancel(_ textField: UITextField) {
+        printLog(textField)
+    }
+}
