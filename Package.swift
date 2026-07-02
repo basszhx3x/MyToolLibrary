@@ -11,8 +11,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "MCToast"),
-        .package(url: "https://github.com/evgenyneu/keychain-swift.git", from: "24.0.0"),
+.package(url: "https://github.com/evgenyneu/keychain-swift.git", from: "24.0.0"),
         .package(url: "https://github.com/iAmMccc/SmartCodable.git", branch: "main"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.0.0"),
@@ -28,8 +27,7 @@ let package = Package(
         .target(
             name: "ChimpionTools",
             dependencies: [
-                "MCToast",
-                "KeychainSwift",
+"KeychainSwift",
                 "SmartCodable",
                 "SnapKit",
                 "Kingfisher",
