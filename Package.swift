@@ -42,7 +42,7 @@ let package = Package(
             path: "Sources",
             resources: [
                 .process("Assets"),
-                .process("ChimpionTools/Resources"),
+                .process("MyToolLibrary/Resources"),
             ]
         ),
         .testTarget(
