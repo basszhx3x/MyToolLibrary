@@ -40,6 +40,7 @@ let package = Package(
                 "SwiftDate",
             ],
             path: "Sources",
+            exclude: ["ToolLibrary"],
             resources: [
                 .process("Assets"),
                 .process("MyToolLibrary/Resources"),
