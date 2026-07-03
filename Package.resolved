@@ -1,16 +1,104 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Alamofire",
-        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
-        "state": {
-          "branch": null,
-          "revision": "7be73f6c2b5cd90e40798b06ebd5da8f9f79cf88",
-          "version": "5.11.0"
-        }
+  "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "7595cbcf59809f9977c5f6378500de2ad73b7ddb",
+        "version" : "5.12.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "keychain-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/evgenyneu/keychain-swift.git",
+      "state" : {
+        "revision" : "d108a1fa6189e661f91560548ef48651ed8d93b9",
+        "version" : "20.0.0"
+      }
+    },
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher.git",
+      "state" : {
+        "revision" : "2ef543ee21d63734e1c004ad6c870255e8716c50",
+        "version" : "7.12.0"
+      }
+    },
+    {
+      "identity" : "localize-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/marmelroy/Localize-Swift.git",
+      "state" : {
+        "revision" : "0aa221fed0512772eaad04171d966b8d77b15212",
+        "version" : "3.2.0"
+      }
+    },
+    {
+      "identity" : "mjrefresh",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CoderMJLee/MJRefresh.git",
+      "state" : {
+        "revision" : "535d39c86e592d73f8b8e75f9bf1eda62ca4a4ce",
+        "version" : "3.7.9"
+      }
+    },
+    {
+      "identity" : "smartcodable",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/iAmMccc/SmartCodable.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "503f88a5d60c2af0f25d42845fe0912e1539e56c"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "swiftdate",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/malcommac/SwiftDate.git",
+      "state" : {
+        "revision" : "5d943224c3bb173e6ecf27295611615eba90c80e",
+        "version" : "7.0.0"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
+      }
+    },
+    {
+      "identity" : "swiftyuserdefaults",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sunshinejr/SwiftyUserDefaults.git",
+      "state" : {
+        "revision" : "f66bcd04088582c8fbb5cb8554d577e303bae396",
+        "version" : "5.3.0"
+      }
+    },
+    {
+      "identity" : "swipecellkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwipeCellKit/SwipeCellKit",
+      "state" : {
+        "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
+        "version" : "2.7.1"
+      }
+    }
+  ],
+  "version" : 2
 }
