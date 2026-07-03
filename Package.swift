@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "ChimpionTools",
+    name: "MyToolLibrary",
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "ChimpionTools",
-            targets: ["ChimpionTools"]
+            name: "MyToolLibrary",
+            targets: ["MyToolLibrary"]
         ),
     ],
     dependencies: [
@@ -25,7 +25,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "ChimpionTools",
+            name: "MyToolLibrary",
             dependencies: [
 "KeychainSwift",
                 "SmartCodable",
@@ -46,8 +46,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "ChimpionToolsTests",
-            dependencies: ["ChimpionTools"]
+            name: "MyToolLibraryTests",
+            dependencies: ["MyToolLibrary"]
         ),
     ]
 )
