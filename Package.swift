@@ -2,16 +2,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "MyToolLibrary",
+    name: "ChimpionTools",
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "MyToolLibrary",
-            targets: ["MyToolLibrary"]
+            name: "ChimpionTools",
+            targets: ["ChimpionTools"]
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/evgenyneu/keychain-swift.git", from: "20.0.0"),
+        .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "20.0.0")),
         .package(url: "https://github.com/iAmMccc/SmartCodable.git", branch: "main"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.0.0"),
@@ -20,14 +20,15 @@ let package = Package(
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0"),
         .package(url: "https://github.com/CoderMJLee/MJRefresh.git", from: "3.7.5"),
         .package(url: "https://github.com/SwipeCellKit/SwipeCellKit", from: "2.7.1"),
-        .package(url: "https://github.com/marmelroy/Localize-Swift.git", from: "3.0.0"),
+        .package(url: "https://github.com/marmelroy/Localize-Swift.git", .upToNextMajor(from: "3.2.0")),
         .package(url: "https://github.com/malcommac/SwiftDate.git", from: "7.0.0"),
     ],
     targets: [
         .target(
-            name: "MyToolLibrary",
+            name: "ChimpionTools",
             dependencies: [
-                "KeychainSwift",
+                .product(name: "KeychainSwift", package: "keychain-swift"),
+                .product(name: "Localize_Swift", package: "Localize-Swift"),
                 "SmartCodable",
                 "SnapKit",
                 "Kingfisher",
@@ -36,18 +37,17 @@ let package = Package(
                 "SwiftyJSON",
                 "MJRefresh",
                 "SwipeCellKit",
-                "Localize-Swift",
                 "SwiftDate",
             ],
             path: "Sources",
             resources: [
                 .process("Assets"),
-                .process("MyToolLibrary/Resources"),
+                .process("ChimpionTools/Resources"),
             ]
         ),
         .testTarget(
-            name: "MyToolLibraryTests",
-            dependencies: ["MyToolLibrary"]
+            name: "ChimpionToolsTests",
+            dependencies: ["ChimpionTools"]
         ),
     ]
 )
