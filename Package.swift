@@ -3,11 +3,8 @@ import PackageDescription
 
 let package = Package(
     name: "ChimpionTools",
-    platforms: [.iOS(.v15),
-                .macOS(.v10_13),
-                .tvOS(.v12),
-                .watchOS(.v4),
-    ],
+    platforms: [.iOS(.v15)],
+
     products: [
         .library(
             name: "ChimpionTools",
@@ -44,7 +41,6 @@ let package = Package(
                 "SwiftDate",
             ],
             path: "Sources",
-            exclude: ["ToolLibrary"],
             resources: [
                 .process("Assets"),
                 .process("MyToolLibrary/Resources"),
