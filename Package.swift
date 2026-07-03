@@ -3,7 +3,11 @@ import PackageDescription
 
 let package = Package(
     name: "ChimpionTools",
-    platforms: [.iOS(.v15)],
+    platforms: [.iOS(.v15),
+                .macOS(.v10_13),
+                .tvOS(.v12),
+                .watchOS(.v4),
+    ],
     products: [
         .library(
             name: "ChimpionTools",
@@ -11,7 +15,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "24.0.0")),
+        .package(url: "https://github.com/evgenyneu/keychain-swift.git", .upToNextMajor(from: "20.0.0")),
         .package(url: "https://github.com/iAmMccc/SmartCodable.git", branch: "main"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.0.0"),
